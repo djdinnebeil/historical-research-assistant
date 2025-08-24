@@ -1,0 +1,40 @@
+{
+    "reports": {
+      "new-jersey-department-of-health-report-on-amatol-population-1918-1920": {
+        "title": "Mullica River Section",
+        "coverage_years": "1918-1920",
+        "publication_year": 1921,
+        "pages": "175",
+        "citation": "Forty-Third Annual Report of the Department of Health of the State of New Jersey, 1920, p. 175, \"Mullica River Section\""
+      },
+      "war-department-report-on-amatol-1918-1919": {
+        "title": "Amatol Arsenal",
+        "coverage_years": "1918-1919",
+        "publication_year": 1920,
+        "pages": "3936-3937",
+        "citation": "War Department Annual Reports, 1919, pp. 3936-3937, \"Amatol Arsenal\""
+      },
+      "war-department-report-on-amatol-1919": {
+        "title": "Amatol Arsenal",
+        "coverage_years": "1919",
+        "publication_year": 1920,
+        "pages": "1202-1203",
+        "citation": "War Department Annual Reports, 1920, pp. 1202-1203, \"Amatol Arsenal\""
+      },
+      "war-expenditures-hearings-testimony-of-colonel-hawkins-on-amatol-nj-general-plan-1918": {
+        "title": "Testimony of Colonel Hawkins",
+        "coverage_years": "1918",
+        "publication_year": 1919,
+        "pages": "490-494",
+        "citation": "War Expenditures: Hearings Before Subcommittee No. 5 (Ordnance) of the Select Committee on Expenditures in the War Department, House of Representatives, Sixty-sixth Congress on War Expenditures, vol. 1, pp. 490-494, \"Testimony of Colonel Hawkins\""
+      },
+      "war-expenditures-hearings-testimony-of-colonel-hawkins-on-amatol-nj-attractions-needed-1918": {
+        "title": "Testimony of Colonel Hawkins",
+        "coverage_years": "1918",
+        "publication_year": 1919,
+        "pages": "511",
+        "citation": "War Expenditures: Hearings Before Subcommittee No. 5 (Ordnance) of the Select Committee on Expenditures in the War Department, House of Representatives, Sixty-sixth Congress on War Expenditures, vol. 1, p. 511, \"Testimony of Colonel Hawkins\""
+      }
+    }
+  }
+  

@@ -1,0 +1,40 @@
+=== File: amatol-test/newspapers/1918/1918-12-25__philadelphia-inquirer__p2__first-wedding.txt ===
+Page Content:
+Philadelphia Actress Marries
+1918-12-24
+Announcement was made today of the marriage of Miss Agnes Belcher, an actress of Philadelphia, and Peter James Reilly, of New York City, at Amatol. The wedding was the first solemnized at the town which was created by the large munition plants in the locality.
+
+The groom, who was employed as a guard, recently fell heir to a large fortune by the will of a deceased uncle in the West. Rev. Thomas M. Sparks, of Hammonton, performed the ceremony yesterday afternoon.
+
+Metadata:
+  source_type: newspaper
+  source_id: philadelphia-inquirer
+  source_name: Philadelphia Inquirer
+  date: 1918-12-25
+  page: p2
+  title: Philadelphia Actress Marries
+  subtitles: []
+  attribution: Special to The Inquirer.
+  city_date: ATLANTIC CITY, N. J., Dec. 24.
+  file_path: amatol-test/newspapers/1918/1918-12-25__philadelphia-inquirer__p2__first-wedding.txt
+  citation: Philadelphia Inquirer, 1918-12-25, p2, "Philadelphia Actress Marries"
+
+=== File: amatol-test/newspapers/1918/1918-06-05__philadelphia-inquirer__p13__new-train-service-and-population-size.txt ===
+Page Content:
+Accommodations For Loaders
+1918-06-04
+The West Jersey and Seashore Railroad has just inaugurated a train service to Amatol, the new town built by and for the Atlantic Loading Company, the new munition concern whose plant is located several miles from this place. Amatol is now a hustling community of nearly two thousand people. The new service makes one trip a day between Berlin and Amatol, and two trips a day between this place and Amatol. Hundreds of employees patronized the service yesterday, the initial day of the project.
+
+Metadata:
+  source_type: newspaper
+  source_id: philadelphia-inquirer
+  source_name: Philadelphia Inquirer
+  date: 1918-06-05
+  page: p13
+  title: Accommodations For Loaders
+  subtitles: []
+  attribution: Special to The Inquirer.
+  city_date: HAMMONTON, N. J., June 4
+  file_path: amatol-test/newspapers/1918/1918-06-05__philadelphia-inquirer__p13__new-train-service-and-population-size.txt
+  citation: Philadelphia Inquirer, 1918-06-05, p13, "Accommodations For Loaders"
+
