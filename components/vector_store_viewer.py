@@ -2,7 +2,7 @@ import streamlit as st
 from qdrant_client import QdrantClient
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
-from local_qdrant import get_qdrant_client
+from local_qdrant import get_qdrant_client, clear_qdrant_cache
 import json
 
 def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
@@ -30,6 +30,18 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
             st.metric("Points Count", collection_info.points_count)
         with col3:
             st.metric("Segments Count", collection_info.segments_count)
+        
+        # Debug information
+        st.subheader("🔍 Debug Information")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("**Project Name:**", project_name)
+            st.write("**Collection Name:**", collection_name)
+            st.write("**Qdrant Path:**", str(qdrant_path))
+        with col2:
+            st.write("**Client ID:**", id(client))
+            st.write("**Cache Status:**", "Cached" if hasattr(client, '_cached') else "Fresh")
+            st.write("**Connection Active:**", "✅ Yes" if client.collection_exists(collection_name) else "❌ No")
         
         # Display collection configuration
         st.subheader("⚙️ Collection Configuration")
@@ -117,7 +129,7 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
         # Collection management
         st.subheader("🗑️ Collection Management")
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         
         with col1:
             if st.button("🔄 Refresh Collection Info"):
@@ -132,6 +144,16 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
                         st.rerun()
                     except Exception as e:
                         st.error(f"Failed to delete collection: {str(e)}")
+        
+        with col3:
+            if st.button("🧹 Clear Cache"):
+                try:
+                    clear_qdrant_cache()
+                    st.success("✅ Qdrant cache cleared successfully!")
+                    st.info("🔄 Refreshing connection...")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to clear cache: {str(e)}")
         
     except Exception as e:
         st.error(f"Failed to connect to vector store: {str(e)}")

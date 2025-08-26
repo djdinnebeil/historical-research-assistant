@@ -1,7 +1,7 @@
 import streamlit as st
 from pathlib import Path
 from db import ensure_db, set_project_db
-from local_qdrant import get_qdrant_client
+from local_qdrant import get_qdrant_client, clear_qdrant_cache
 
 PROJECTS_DIR = Path("projects")
 
@@ -24,6 +24,11 @@ def render_sidebar():
         index=options.index(st.session_state["selected_project"]) 
               if st.session_state["selected_project"] in options else 0
     )
+    
+    # Clear Qdrant cache when switching projects to avoid stale connections
+    if selected != st.session_state["selected_project"] and st.session_state["selected_project"] != "-- New Project --":
+        clear_qdrant_cache()
+        st.info(f"🔄 Switched from {st.session_state['selected_project']} to {selected}")
 
     if selected == "-- New Project --":
         new_name = st.sidebar.text_input("New project name")
@@ -51,7 +56,7 @@ def render_sidebar():
     # --- Navigation menu ---
     nav_choice = st.sidebar.radio(
         "Navigation",
-        ["Uploader", "Pending Documents", "Process Pending", "Vector Store", "Document Manager"]
+        ["Uploader", "Pending Documents", "Process Pending", "Vector Store", "Document Manager", "Ask Questions"]
     )
 
     proj_dir = PROJECTS_DIR / selected

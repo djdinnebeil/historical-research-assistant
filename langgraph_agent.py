@@ -1,4 +1,5 @@
 # langgraph_agent.py
+import streamlit as st
 from typing_extensions import TypedDict
 from langchain_core.documents import Document
 from langgraph.graph import StateGraph, END
@@ -9,21 +10,18 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from retriever_chain import load_chain
 from typing import Annotated
 from langgraph.graph.message import add_messages
-import config 
-
-# langgraph_agent.py
-import streamlit as st
-from retriever_chain import load_chain
+import config
 
 # ✅ Cache the chain so it reuses the same Qdrant client
 @st.cache_resource
 def get_chains(project_name: str, collection_name: str):
     return load_chain(project_name, collection_name)
 
-qa_chain, naive_retriever = get_chains(
-    st.session_state["selected_project"],
-    st.session_state["collection_name"]
-)
+# Remove the global chain initialization since it will be called from the component
+# qa_chain, naive_retriever = get_chains(
+#     st.session_state["selected_project"],
+#     st.session_state["collection_name"]
+# )
 
 
 llm = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
@@ -49,8 +47,16 @@ def historical_rag_tool(question: str) -> str:
     """Search and retrieve information from uploaded historical documents. 
     Use this tool first for any question to check what historical information is available, 
     then consider using web search to supplement with current information."""
-    response = qa_chain.invoke(question)
-    return f"Historical documents result:\n\n{response['result']}"
+    # Get the chains dynamically based on current project
+    if "selected_project" in st.session_state and "collection_name" in st.session_state:
+        qa_chain, naive_retriever = get_chains(
+            st.session_state["selected_project"],
+            st.session_state["collection_name"]
+        )
+        response = qa_chain.invoke(question)
+        return f"Historical documents result:\n\n{response['result']}"
+    else:
+        return "Error: No project selected or collection name not found."
 
 
 # Tool belt

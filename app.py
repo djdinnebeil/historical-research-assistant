@@ -5,6 +5,7 @@ from components.pending_list import render_pending_list
 from components.process_pending import render_process_pending
 from components.vector_store_viewer import render_vector_store_viewer
 from components.document_manager import render_document_manager
+from components.qa_interface import render_qa_interface
 
 st.title("📜 Historical Research Assistant")
 
@@ -24,3 +25,5 @@ if db_client:
         render_vector_store_viewer(proj_dir, proj_dir / "qdrant", collection_name)
     elif nav_choice == "Document Manager":
         render_document_manager(proj_dir, con, collection_name)
+    elif nav_choice == "Ask Questions":
+        render_qa_interface(selected, collection_name)

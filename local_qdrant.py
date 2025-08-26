@@ -31,6 +31,10 @@ def get_qdrant_client(project_name: str):
     qdrant_path.mkdir(parents=True, exist_ok=True)
     return QdrantClient(path=str(qdrant_path))
 
+def clear_qdrant_cache():
+    """Clear the cached Qdrant clients to force fresh connections."""
+    get_qdrant_client.clear()
+
 
 # --- Step 1: Recursively find all .txt files ---
 from langchain.schema import Document

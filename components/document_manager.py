@@ -2,6 +2,7 @@ import streamlit as st
 from db import list_all_documents, delete_document
 from local_qdrant import get_qdrant_client
 from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Qdrant
 from pathlib import Path
 import json
 
@@ -9,6 +10,30 @@ COLUMNS = [
     "id", "path", "citation", "source_type", "source_id",
     "date", "num_chunks", "content_hash", "status", "added_at"
 ]
+
+def debug_vector_metadata(client, collection_name):
+    """Debug function to show vector metadata structure"""
+    try:
+        if client.collection_exists(collection_name):
+            points = client.scroll(
+                collection_name=collection_name,
+                limit=5,  # Just get a few points for debugging
+                with_payload=True,
+                with_vectors=False
+            )
+            
+            if points[0]:
+                st.write("**Vector Metadata Structure (Sample):**")
+                for i, point in enumerate(points[0][:3]):  # Show first 3 points
+                    st.write(f"**Point {i+1}:**")
+                    st.json(point.payload)
+                    st.write("---")
+            else:
+                st.info("No vectors found in collection")
+        else:
+            st.warning("Collection does not exist")
+    except Exception as e:
+        st.error(f"Error debugging vector metadata: {str(e)}")
 
 def render_document_manager(proj_dir, con, collection_name):
     st.subheader("📚 Document Manager")
@@ -188,6 +213,17 @@ def render_document_manager(proj_dir, con, collection_name):
                         st.write("- Remove all associated vectors from the vector store")
                         st.write("- This action cannot be undone!")
                     
+                    # File deletion option
+                    st.write("**File Management:**")
+                    delete_file_option = st.checkbox(
+                        f"🗑️ Also delete the actual file '{Path(record['path']).name}' from the projects folder?",
+                        key=f"delete_file_{doc_key}",
+                        help="If checked, the file will be permanently removed from your computer. If unchecked, only the database record and vectors will be deleted."
+                    )
+                    
+                    if delete_file_option:
+                        st.warning("⚠️ **File Deletion Warning:** The file will be permanently deleted from your computer and cannot be recovered!")
+                    
                     col1, col2, col3 = st.columns(3)
                     
                     with col1:
@@ -202,147 +238,112 @@ def render_document_manager(proj_dir, con, collection_name):
                                         project_name = proj_dir.name
                                         client = get_qdrant_client(project_name)
                                         
-                                                                                # Get Qdrant client and remove vectors
                                         if client.collection_exists(collection_name):
                                             deleted_count = 0
                                             
-                                            # Strategy 1: Try to find vectors by content_hash in metadata
+                                            # Get all points in the collection to find matching ones
                                             try:
-                                                points = client.scroll(
+                                                all_points = client.scroll(
                                                     collection_name=collection_name,
-                                                    scroll_filter={
-                                                        "must": [
-                                                            {
-                                                                "key": "content_hash",
-                                                                "match": {"value": record['content_hash']}
-                                                            }
-                                                        ]
-                                                    },
-                                                    limit=1000,
-                                                    with_payload=False,
+                                                    limit=10000,  # Increased limit to catch all vectors
+                                                    with_payload=True,
                                                     with_vectors=False
                                                 )
                                                 
-                                                if points[0]:  # points are in first element
-                                                    point_ids = [point.id for point in points[0]]
-                                                    if point_ids:
+                                                if all_points[0]:  # points are in first element
+                                                    matching_point_ids = []
+                                                    
+                                                    for point in all_points[0]:
+                                                        payload = point.payload or {}
+                                                        
+                                                        # Check multiple possible metadata fields for matches
+                                                        content_hash_match = payload.get('content_hash') == record['content_hash']
+                                                        path_match = payload.get('path') == record['path']
+                                                        filename_match = payload.get('filename') == Path(record['path']).name
+                                                        
+                                                        # Also check if the content_hash is in the metadata as a string
+                                                        content_hash_in_metadata = (
+                                                            record['content_hash'] in str(payload.get('metadata', {})) or
+                                                            record['content_hash'] in str(payload.get('source', {}))
+                                                        )
+                                                        
+                                                        if any([content_hash_match, path_match, filename_match, content_hash_in_metadata]):
+                                                            matching_point_ids.append(point.id)
+                                                    
+                                                    if matching_point_ids:
+                                                        # Delete all matching vectors
                                                         client.delete(
                                                             collection_name=collection_name,
-                                                            points_selector=point_ids
+                                                            points_selector=matching_point_ids
                                                         )
-                                                        deleted_count += len(point_ids)
-                                                        st.success(f"✅ Deleted {len(point_ids)} vectors by content_hash")
-                                            except Exception as e:
-                                                st.info(f"Strategy 1 (content_hash) failed: {str(e)}")
-                                            
-                                            # Strategy 2: If no vectors found by content_hash, try to find by file path
-                                            if deleted_count == 0:
-                                                try:
-                                                    # Look for vectors with file path in metadata
-                                                    points = client.scroll(
-                                                        collection_name=collection_name,
-                                                        scroll_filter={
-                                                            "must": [
-                                                                {
-                                                                    "key": "path",
-                                                                    "match": {"value": record['path']}
-                                                                }
-                                                            ]
-                                                        },
-                                                        limit=1000,
-                                                        with_payload=False,
-                                                        with_vectors=False
-                                                    )
-                                                    
-                                                    if points[0]:
-                                                        point_ids = [point.id for point in points[0]]
-                                                        if point_ids:
-                                                            client.delete(
-                                                                collection_name=collection_name,
-                                                                points_selector=point_ids
-                                                            )
-                                                            deleted_count += len(point_ids)
-                                                            st.success(f"✅ Deleted {len(point_ids)} vectors by file path")
-                                                except Exception as e:
-                                                    st.info(f"Strategy 2 (file path) failed: {str(e)}")
-                                            
-                                            # Strategy 3: Last resort - try to find vectors by content similarity
-                                            if deleted_count == 0:
-                                                try:
-                                                    # Get a sample of the document content to search for similar vectors
-                                                    file_path = None
-                                                    if Path(record['path']).is_absolute():
-                                                        file_path = Path(record['path'])
+                                                        deleted_count = len(matching_point_ids)
+                                                        st.success(f"✅ Deleted {deleted_count} vectors from vector store")
+                                                        
+                                                        # Log what was found for debugging
+                                                        st.info(f"Found vectors by: content_hash={content_hash_match}, path={path_match}, filename={filename_match}")
                                                     else:
-                                                        possible_paths = [
-                                                            proj_dir / record['path'],
-                                                            proj_dir / "documents" / record['path'],
-                                                            proj_dir / "documents" / Path(record['path']).name
-                                                        ]
-                                                        for path in possible_paths:
-                                                            if path.exists():
-                                                                file_path = path
-                                                                break
-                                                    
-                                                    if file_path and file_path.exists():
-                                                        with open(file_path, 'r', encoding='utf-8') as f:
-                                                            content_sample = f.read()[:500]  # First 500 chars
-                                                            
-                                                        # Search for similar content
-                                                        embeddings = OpenAIEmbeddings()
-                                                        vectorstore = Qdrant(
-                                                            client=client,
-                                                            collection_name=collection_name,
-                                                            embeddings=embeddings
-                                                        )
+                                                        st.warning("⚠️ No matching vectors found in vector store. This may indicate:")
+                                                        st.write("- Vectors were stored with different metadata keys")
+                                                        st.write("- The document wasn't properly embedded")
+                                                        st.write("- Metadata structure is different than expected")
                                                         
-                                                        similar_docs = vectorstore.similarity_search(content_sample, k=10)
-                                                        
-                                                        # Find exact matches by comparing content
-                                                        exact_matches = []
-                                                        for doc in similar_docs:
-                                                            if doc.page_content.startswith(content_sample[:100]):
-                                                                exact_matches.append(doc)
-                                                        
-                                                        if exact_matches:
-                                                            # Get point IDs for exact matches
-                                                            points = client.scroll(
-                                                                collection_name=collection_name,
-                                                                scroll_filter={
-                                                                    "must": [
-                                                                        {
-                                                                            "key": "page_content",
-                                                                            "match": {"text": content_sample[:100]}
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                limit=1000,
-                                                                with_payload=False,
-                                                                with_vectors=False
-                                                            )
-                                                            
-                                                            if points[0]:
-                                                                point_ids = [point.id for point in points[0]]
-                                                                if point_ids:
-                                                                    client.delete(
-                                                                        collection_name=collection_name,
-                                                                        points_selector=point_ids
-                                                                    )
-                                                                    deleted_count += len(point_ids)
-                                                                    st.success(f"✅ Deleted {len(point_ids)} vectors by content similarity")
-                                                except Exception as e:
-                                                    st.info(f"Strategy 3 (content similarity) failed: {str(e)}")
-                                            
-                                            if deleted_count == 0:
-                                                st.warning("⚠️ No vectors were found to delete. The document may not have been properly embedded.")
-                                            else:
-                                                st.success(f"✅ Successfully deleted {deleted_count} vectors from the collection")
+                                                        # Show sample metadata for debugging
+                                                        if all_points[0]:
+                                                            sample_payload = all_points[0][0].payload
+                                                            st.write("**Sample vector metadata:**")
+                                                            st.json(sample_payload)
+                                                
+                                            except Exception as e:
+                                                st.error(f"Error searching vector store: {str(e)}")
+                                                st.info("You may need to manually clean up the vector store.")
                                        
                                     except Exception as e:
                                         st.error(f"⚠️ Document deleted from database but failed to remove vectors: {str(e)}")
                                         st.info("You may need to manually clean up the vector store.")
                                 
-                                st.success(f"✅ Document '{Path(record['path']).name}' deleted successfully!")
+                                # Handle file deletion if requested
+                                file_deleted = False
+                                if delete_file_option:
+                                    try:
+                                        # Determine the actual file path
+                                        if Path(record['path']).is_absolute():
+                                            actual_file_path = Path(record['path'])
+                                        else:
+                                            # Try multiple possible path combinations
+                                            possible_paths = [
+                                                proj_dir / record['path'],  # Original path
+                                                proj_dir / "documents" / record['path'],  # Add documents/ prefix
+                                                proj_dir / "documents" / Path(record['path']).name  # Just filename
+                                            ]
+                                            
+                                            # Find the first path that exists
+                                            actual_file_path = None
+                                            for path in possible_paths:
+                                                if path.exists():
+                                                    actual_file_path = path
+                                                    break
+                                            
+                                            # If no path found, use the first one for error reporting
+                                            if actual_file_path is None:
+                                                actual_file_path = possible_paths[0]
+                                        
+                                        # Delete the file
+                                        if actual_file_path.exists():
+                                            actual_file_path.unlink()  # Delete the file
+                                            file_deleted = True
+                                            st.success(f"✅ File '{actual_file_path.name}' deleted from projects folder")
+                                        else:
+                                            st.warning(f"⚠️ File not found at: {actual_file_path}")
+                                            
+                                    except Exception as e:
+                                        st.error(f"⚠️ Failed to delete file: {str(e)}")
+                                        st.info("The file may have already been deleted or moved.")
+                                
+                                # Success message
+                                if file_deleted:
+                                    st.success(f"✅ Document '{Path(record['path']).name}' and file deleted successfully!")
+                                else:
+                                    st.success(f"✅ Document '{Path(record['path']).name}' deleted from database (file kept in projects folder)")
                                 
                                 # Clear session state
                                 st.session_state[f"confirm_delete_{doc_key}"] = False
@@ -363,7 +364,7 @@ def render_document_manager(proj_dir, con, collection_name):
         
         # Bulk actions
         st.subheader("⚡ Bulk Actions")
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             if st.button("🔄 Refresh List"):
@@ -371,13 +372,60 @@ def render_document_manager(proj_dir, con, collection_name):
         
         with col2:
             if st.button("🗑️ Delete All Pending"):
+                st.write("**Bulk Delete Options:**")
+                delete_files_bulk = st.checkbox(
+                    "🗑️ Also delete actual files from projects folder?",
+                    key="delete_files_bulk",
+                    help="If checked, all pending document files will be permanently removed from your computer."
+                )
+                
+                if delete_files_bulk:
+                    st.warning("⚠️ **Bulk File Deletion Warning:** All pending document files will be permanently deleted from your computer!")
+                
                 if st.checkbox("I understand this will delete all pending documents"):
                     pending_docs = [doc for doc in all_documents if doc[8] == "pending"]
                     if pending_docs:
                         try:
+                            files_deleted = 0
                             for doc in pending_docs:
                                 delete_document(con, doc[7])  # content_hash is at index 7
-                            st.success(f"✅ Deleted {len(pending_docs)} pending documents!")
+                                
+                                # Handle file deletion if requested
+                                if delete_files_bulk:
+                                    try:
+                                        # Determine the actual file path
+                                        if Path(doc[1]).is_absolute():  # doc[1] is the path
+                                            actual_file_path = Path(doc[1])
+                                        else:
+                                            # Try multiple possible path combinations
+                                            possible_paths = [
+                                                proj_dir / doc[1],  # Original path
+                                                proj_dir / "documents" / doc[1],  # Add documents/ prefix
+                                                proj_dir / "documents" / Path(doc[1]).name  # Just filename
+                                            ]
+                                            
+                                            # Find the first path that exists
+                                            actual_file_path = None
+                                            for path in possible_paths:
+                                                if path.exists():
+                                                    actual_file_path = path
+                                                    break
+                                            
+                                            # If no path found, use the first one for error reporting
+                                            if actual_file_path is None:
+                                                actual_file_path = possible_paths[0]
+                                        
+                                        # Delete the file
+                                        if actual_file_path.exists():
+                                            actual_file_path.unlink()  # Delete the file
+                                            files_deleted += 1
+                                    except Exception as e:
+                                        st.warning(f"⚠️ Failed to delete file {doc[1]}: {str(e)}")
+                            
+                            if delete_files_bulk and files_deleted > 0:
+                                st.success(f"✅ Deleted {len(pending_docs)} pending documents and {files_deleted} files from projects folder!")
+                            else:
+                                st.success(f"✅ Deleted {len(pending_docs)} pending documents from database (files kept in projects folder)")
                             st.rerun()
                         except Exception as e:
                             st.error(f"❌ Failed to delete some documents: {str(e)}")
@@ -432,6 +480,15 @@ def render_document_manager(proj_dir, con, collection_name):
                             
                     except Exception as e:
                         st.error(f"Failed to clean vector store: {str(e)}")
+        
+        with col4:
+            if st.button("🔍 Debug Vectors"):
+                try:
+                    project_name = proj_dir.name
+                    client = get_qdrant_client(project_name)
+                    debug_vector_metadata(client, collection_name)
+                except Exception as e:
+                    st.error(f"Failed to debug vectors: {str(e)}")
     
     except Exception as e:
         st.error(f"Failed to load documents: {str(e)}")
