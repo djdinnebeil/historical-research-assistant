@@ -17,12 +17,14 @@ from retriever_chain import load_chain
 
 # ✅ Cache the chain so it reuses the same Qdrant client
 @st.cache_resource
-def get_chains():
-    return load_chain()
+def get_chains(project_name: str, collection_name: str):
+    return load_chain(project_name, collection_name)
 
-qa_chain, naive_retriever = get_chains()
+qa_chain, naive_retriever = get_chains(
+    st.session_state["selected_project"],
+    st.session_state["collection_name"]
+)
 
-# ... rest of your agent setup ...
 
 llm = ChatOpenAI(model="gpt-4.1-nano", temperature=0)
 tavily_tool = TavilySearchResults(max_results=5)

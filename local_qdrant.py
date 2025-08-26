@@ -5,23 +5,22 @@ load_dotenv()
 
 import os
 from pathlib import Path
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Qdrant
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Qdrant
 from qdrant_client import QdrantClient
 from tqdm import tqdm
 from qdrant_client.models import VectorParams, Distance
 
 from text_parsers.unified_parser import parse_file
 from db import *
+import streamlit as st
 
 # --- Settings ---
-PROJECT_NAME = 'amatol_project'          # project-specific folder
-COLLECTION_NAME = 'amatol_docs'
-ROOT_DIR = './amatol-test'               # source documents
 BATCH_SIZE = 12                          # tune for performance
 
+@st.cache_resource
 def get_qdrant_client(project_name: str):
     """
     Return a QdrantClient for the given project.
@@ -71,12 +70,12 @@ def adaptive_chunk_documents(docs: list[Document], model: str = 'text-embedding-
     return out_docs
 
 
-def _embedding_dim(embeddings) -> int:
+def embedding_dim(embeddings) -> int:
     return len(embeddings.embed_query('dim?'))
 
-def _ensure_collection(client: QdrantClient, name: str, embeddings) -> None:
+def ensure_collection(client: QdrantClient, name: str, embeddings) -> None:
     if not client.collection_exists(name):
-        dim = _embedding_dim(embeddings)
+        dim = embedding_dim(embeddings)
         client.create_collection(
             collection_name=name,
             vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
@@ -96,7 +95,7 @@ def flush_batch(buffer, vs, con):
 
 
 # --- Step 5: Main Ingestion ---
-def embed_directory_batched(root_dir: str, collection_name: str, batch_size: int = BATCH_SIZE) -> None:
+def embed_directory_batched(root_dir: str, project_name: str, collection_name: str, batch_size: int = BATCH_SIZE) -> None:
     txt_paths = find_txt_files(root_dir)
     if not txt_paths:
         print(f'No .txt files found under {root_dir}')
@@ -108,9 +107,10 @@ def embed_directory_batched(root_dir: str, collection_name: str, batch_size: int
     # Initialize embeddings + vectorstore
     embeddings = OpenAIEmbeddings(model='text-embedding-3-small')
 
-    client = get_qdrant_client()
+    client = get_qdrant_client(project_name)
 
-    _ensure_collection(client, collection_name, embeddings)
+    # Ensure collection exists
+    ensure_collection(client, collection_name, embeddings)
     vs = Qdrant(client=client, collection_name=collection_name, embeddings=embeddings)
 
     staging_buffer = []  # holds chunks before flushing
@@ -188,6 +188,3 @@ def delete_document_from_store(con, client, collection_name: str, doc_id: str) -
     delete_document(con, doc_id)
     print(f"Deleted document {doc_id} from DB and Qdrant.")
 
-
-if __name__ == '__main__':
-    embed_directory_batched(ROOT_DIR, COLLECTION_NAME, BATCH_SIZE)

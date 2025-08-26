@@ -3,6 +3,8 @@ import streamlit as st
 from db import ensure_db, set_project_db
 from local_qdrant import get_qdrant_client
 import shutil
+from db import file_sha256, insert_document, document_exists
+from text_parsers.unified_parser import parse_file
 
 PROJECTS_DIR = Path("projects")
 DOC_TYPES = ["books", "journals", "newspapers", "reports", "web_articles", "unsorted"]
@@ -46,7 +48,7 @@ else:
     uploaded_files = st.file_uploader(
         "Upload one or more files",
         accept_multiple_files=True,
-        type=["txt", "pdf", "docx"]
+        type=["txt"] # type=["txt", "pdf", "docx"]
     )
 
     if uploaded_files:
@@ -66,4 +68,24 @@ else:
                 with open(save_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
 
-                st.success(f"✅ Saved {uploaded_file.name} to {save_path}")
+                new_path = doc_type + "/" + uploaded_file.name
+
+                # --- Insert into DB as pending ---
+                h = file_sha256(save_path)
+                if not document_exists(con, h):
+                    parsed = parse_file(str(new_path))
+                    insert_document(con, new_path, parsed, h, num_chunks=0)
+                    con.commit()
+
+                st.success(f"✅ Saved {uploaded_file.name} to {save_path} (status: pending)")
+
+from db import list_documents_by_status
+
+if st.sidebar.button("View Pending Documents"):
+    rows = list_documents_by_status(con, "pending")
+    if rows:
+        st.write("### Pending Documents")
+        for row in rows:
+            st.write(f"📄 {row[2] or row[1]} — ID: `{row[7]}` — Added {row[9]}")
+    else:
+        st.info("No pending documents.")

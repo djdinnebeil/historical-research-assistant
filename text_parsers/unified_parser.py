@@ -27,7 +27,7 @@ def parse_file(file_path: str) -> dict:
     """
     path = Path(file_path)
     try:
-        folder = path.parts[1]  # e.g., "journals" from "amatol/journals/..."
+        folder = path.parts[3]  # e.g., "journals" from "amatol/journals/..."
     except IndexError:
         raise ValueError(f"Unexpected file structure: {file_path}")
 
@@ -38,7 +38,7 @@ def parse_file(file_path: str) -> dict:
 
 
 if __name__ == "__main__":
-    root = Path("amatol-test")
+    root = Path("amatol")
     all_files = root.rglob("*.txt")
 
     with open("amatol_parsed.txt", "w", encoding="utf-8") as f:

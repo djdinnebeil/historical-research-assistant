@@ -1,13 +1,13 @@
 # components/retriever_chain.py
 from pathlib import Path
 import streamlit as st
-from langchain_qdrant import QdrantVectorStore
+from langchain_community.vectorstores import Qdrant
 from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-from config import COLLECTION_NAME, PROJECT_NAME
+from local_qdrant import get_qdrant_client, ensure_collection
 
 prompt = PromptTemplate(
     template="""You are a helpful historical research assistant.
@@ -21,23 +21,18 @@ Answer:""",
     input_variables=["context", "question"]
 )
 
-# ✅ Cache the Qdrant client so reloads don’t re-lock the DB
-@st.cache_resource
-def get_qdrant_client(project_name: str):
-    project_dir = Path("projects") / project_name
-    qdrant_path = project_dir / "qdrant"
-    qdrant_path.mkdir(parents=True, exist_ok=True)
-    return QdrantClient(path=str(qdrant_path))
-
-def load_chain():
+def load_chain(project_name: str, collection_name: str):
     embeddings = OpenAIEmbeddings()
 
-    client = get_qdrant_client(PROJECT_NAME)
+    client = get_qdrant_client(project_name)
 
-    vectorstore = QdrantVectorStore(
+    # Ensure collection exists before creating vectorstore
+    ensure_collection(client, collection_name, embeddings)
+
+    vectorstore = Qdrant(
         client=client,
-        collection_name=COLLECTION_NAME,
-        embedding=embeddings
+        collection_name=collection_name,
+        embeddings=embeddings
     )
     naive_retriever = vectorstore.as_retriever(search_kwargs={"k": 15})
 

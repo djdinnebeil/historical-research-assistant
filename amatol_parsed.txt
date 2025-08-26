@@ -1,40 +1,722 @@
-=== File: amatol-test/newspapers/1918/1918-12-25__philadelphia-inquirer__p2__first-wedding.txt ===
+=== File: amatol/books/iron_age/p483__big-buying-to-come.txt ===
 Page Content:
-Philadelphia Actress Marries
-1918-12-24
-Announcement was made today of the marriage of Miss Agnes Belcher, an actress of Philadelphia, and Peter James Reilly, of New York City, at Amatol. The wedding was the first solemnized at the town which was created by the large munition plants in the locality.
+Big Buying To Come
 
-The groom, who was employed as a guard, recently fell heir to a large fortune by the will of a deceased uncle in the West. Rev. Thomas M. Sparks, of Hammonton, performed the ceremony yesterday afternoon.
+Big Buying To Come: New York
+The Atlantic Loading Co., 71 Broadway, New York, is planning the erection of a works near Whiting's Station, N. J., to be used exclusively, it is reported, for the manufacture of ammunition for the Government. It was recently planned to locate the plant near Brown's Mills, in the vicinity of Camp Dix, but owing to water supply conditions it has been decided to change the site.
 
 Metadata:
-  source_type: newspaper
-  source_id: philadelphia-inquirer
-  source_name: Philadelphia Inquirer
-  date: 1918-12-25
-  page: p2
-  title: Philadelphia Actress Marries
-  subtitles: []
-  attribution: Special to The Inquirer.
-  city_date: ATLANTIC CITY, N. J., Dec. 24.
-  file_path: amatol-test/newspapers/1918/1918-12-25__philadelphia-inquirer__p2__first-wedding.txt
-  citation: Philadelphia Inquirer, 1918-12-25, p2, "Philadelphia Actress Marries"
+  source_type: book
+  source_id: iron_age
+  source_name: Iron Age Vol. CI
+  title: Iron Age Vol. CI
+  author: None
+  year: 1918
+  date: 1918
+  pages: p483
+  section: Big Buying To Come
+  file_path: amatol/books/iron_age/p483__big-buying-to-come.txt
+  citation: Iron Age Vol. CI, 1918, p. 483, Big Buying To Come: New York
 
-=== File: amatol-test/newspapers/1918/1918-06-05__philadelphia-inquirer__p13__new-train-service-and-population-size.txt ===
+=== File: amatol/books/amatol_book/p253-254__auxiliary-operations.txt ===
 Page Content:
-Accommodations For Loaders
-1918-06-04
-The West Jersey and Seashore Railroad has just inaugurated a train service to Amatol, the new town built by and for the Atlantic Loading Company, the new munition concern whose plant is located several miles from this place. Amatol is now a hustling community of nearly two thousand people. The new service makes one trip a day between Berlin and Amatol, and two trips a day between this place and Amatol. Hundreds of employees patronized the service yesterday, the initial day of the project.
+Auxiliary Operations
+
+AUXILIARY OPERATIONS
+The auxiliary operations—those distinct from both town management and plant operations, or having to do with the two jointly—were peculiarly complex. The need for extreme speed as well as other considerations raised unique problems to be solved. An auxiliary operation is the electrical power system, which is one of the many notable features of the undertaking. The main electrical system of the plant and town consists of a three-phase, 60 cycle, 66,000-volt transmission line, which extends almost thirty miles from the power house of the Atlantic City Electric Company. This is carried on wooden poles. The crossing over the bay at Atlantic City is carried by two steel towers 1000 ft. apart.
+
+There are two transformer banks, one at the Atlantic City and the other near Amatol, each consisting of three 4,500-kva. oil insulated, water cooled units, electrolytic lightning arresters with pole top air break switches on the 66,000-volt line and oil switches on the low tension line.
+
+The local distribution at both the plantsite and Amatol is 4,000 volt, with 2,300 volt transformers, star connected. Motors are 440 and 220 volt, lighting 220/110 volt three wire. This local distribution is controlled through incoming and outgoing oil switches at the 500-kw. steam-electric station and the distribution lines are further protected by sectionalizing pole-top oil switches, so located and connected as to afford, selective-service to all sections of the plant, magazine and storage areas. In every case the area can be supplied by at least two feeders and in some cases by three.
+
+The plant is guarded at night by a protective fence lighting system, which extends around the loading, the storage and the magazine sections, with a total length of nine miles, divided into twenty-six separate sections. Each section is on a selective feeder, with a searchlight that sweeps behind two sections about 1,200 feet apart. These searchlights are sweeped by current from either of the two adjacent sections, giving very wide selective service. The lights have a range of about 2,000 feet. Armed guards are stationed at every section.
+
+For reserve service there is a 500-kw. 2,300 volt generating station within the plant area. The generating units are two 250-kw., 2,300 volt generators, direct connected to compound reciprocating steam engines.
+
+In addition to this station there is a second reserve station of 125-kw. at the townsite. Both this and the 500-kw. station are connected through steam mains to the nearby steam heating boilers, so that electric service can be given at short notice.
+
+Water and sewerage systems are complete in every detail. Driven wells are the source of the water supply. The wells range in depth from 120 to 335 feet and will yield 1,750,000 gallons per twenty-four hours. At the present time five of the wells are finished, giving a total of 1,350,000 gallons per twenty-four hours.
+
+The air-lift system is employed to raise the water to the ground level where it is carried by collecting lines to a receiving basin. The basin is of 54,000 gallons’ capacity. It receives all the water from the wells and acts as a reservoir from which the pumps lift the water to town and plant. The basin is completely constructed of timber, concrete covered and partially buried in the ground. Compressed air is furnished for the air-lift pumps by four Chicago pneumatic compressors, two high pressure and two low pressure. They are in duplicate; one of each set supplies enough air to lift from the wells approximately 1,750,000 gallons of water per twenty-four hours. They are electrically driven and automatically controlled by the pressure of the water in the receiving basin. The compressed air is carried to the covered wells by underground air piping which involves 1800 feet of pipe, the sizes varying from two to five inches. Each well with its air-lift pump is to be covered with a well house. Five wells are fitted with Weber air-lift pumps.
+
+Three Worthington triplex force pumps lift the water from the receiving basin to the elevated tanks in town and plant. Each pump, electrically driven, has a capacity of 350 gallons of water per minute, or a total capacity of a million and one half gallons per twenty-four hours.
+
+The pumps are automatically controlled to cut out when the pressure tanks are full and to resume duty when the water in the tanks recedes to a certain level.
+
+There is one tank at the townsite mounted on 100-ft. steel tower; six at the plantsite of the same size and height as the town tank, except the two in the rear of the 6-inch 50/50 plant, which are on 110-ft. steel towers. Each of these tanks is of 50,000 gallons' capacity. There are also three small wooden tanks, size 10 × 10 feet, mounted on frame towers located at Camp Doring, Magnolia Camp and near Heating Plant No. 1. There are also driven wells varying in depth from 130 to 150 feet at these locations.
+
+The town water supply mains are 10-inch, 8-inch, 6-inch and 4-inch Universal cast-iron pipe, totaling 9 miles in length. In the plant there are 20 miles of mains. The hydrants in the town are what are known as the Corey and the Darling, solid stress, frost-proof, non-freezing types, with two 2½-inch independent hose nozzles and one steamer connection. At the plant the Darling type is used exclusively.
+
+The town is served by a complete and modern sewerage system and disposal works. An 18-inch and a 15-inch trunk sewer carry all the sewage collected by the laterals from the town to the septic tanks. From the septic tanks the effluent is piped to sand filters, whence in a purified state it eventually finds its way to tide-water.
+
+The septic tanks are three in number, each 125 feet long and 12 feet wide, with an effective depth of 9 feet and of 101,250 gallons’ capacity. The purpose of the septic tanks is to settle out and to decompose the solid matter in the sewage.
+
+Before the sewage is run out upon the sand filter beds it is collected and retained in a dosing tank. This tank is of 30,000 gallons’ capacity and when full is automatically released and the dose run out upon one of the beds. The other beds are dosed in turn and the cycle repeated.
+
+The sand filter beds are eight in number, comprising 3½ acres of filtering sand. The effluent is distributed upon the beds by wooden troughs. It filters through 2½ feet of sand and is caught by under drains. These empty into an 18-inch out-fall sewer, which carries away the purified effluent.
+
+Included among the major auxiliary operations also is the Amatol Railroad, which will have 50 miles of standard gauge railroad track. It has 10 locomotives and 30 passenger cars. When the railroad was started it was virtually impossible to obtain passenger cars to carry workmen between town and plant. Some of the cars are street railway cars obtained in Chicago and remade for their present use.
+
+The conduct of automobile and truck transportation, stables for over 500 horses, coal storage, telephone system, army barracks, and various other activities are also included among auxiliary operations. These have all been organized and conducted with the same thoroughness as the operation of the plant and the administration of the town.
 
 Metadata:
-  source_type: newspaper
-  source_id: philadelphia-inquirer
-  source_name: Philadelphia Inquirer
-  date: 1918-06-05
-  page: p13
-  title: Accommodations For Loaders
-  subtitles: []
-  attribution: Special to The Inquirer.
-  city_date: HAMMONTON, N. J., June 4
-  file_path: amatol-test/newspapers/1918/1918-06-05__philadelphia-inquirer__p13__new-train-service-and-population-size.txt
-  citation: Philadelphia Inquirer, 1918-06-05, p13, "Accommodations For Loaders"
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p253-254
+  section: Auxiliary Operations
+  file_path: amatol/books/amatol_book/p253-254__auxiliary-operations.txt
+  citation: Amatol Book, 1918, pp. 253–254, Auxiliary Operations
+
+=== File: amatol/books/amatol_book/p179__map-of-the-town-of-amatol.txt ===
+Page Content:
+Map Of The Town Of Amatol
+
+Map of the Town of Amatol, New Jersey
+An example of the art of town planning. With an undeveloped piece of land, it was possible to apply the principles of artistic town design and create units in correct and convenient relation to each other.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p179
+  section: Map Of The Town Of Amatol
+  file_path: amatol/books/amatol_book/p179__map-of-the-town-of-amatol.txt
+  citation: Amatol Book, 1918, p. 179, Map Of The Town Of Amatol
+
+=== File: amatol/books/amatol_book/p014-018__scope-of-the-work.txt ===
+Page Content:
+Scope Of The Work
+
+SCOPE OF THE WORK
+
+In April, 1917, when the United States declared war on Germany, and began the work of enlarging the Army and Navy and providing for the needed supply of food, clothing and munitions, its greatest task was to provide for the manufacture of munitions. The needed men were here; it only remained to draft and drill them. Food and clothing were being produced; it only remained to stimulate production. But to provide for an ample supply of munitions new factories had to be built and peacetime works transformed into gun and shell producers.
+
+The achievements of 1918 showed how well this work had been done in 1917. Once the lathes and the forges were working it became necessary to supply the high explosives with which to charge the shell they turned out, and to provide extensive machinery for doing the charging. Contracts were made for the production on a vast scale of trinitrotoluol, the destructive explosive used in modern big gun ammunition, and other contracts for the construction of plants for the loading of the shell as fast as the mills turned them out.
+
+Four large shell loading plants were projected and eventually placed in operation, namely, those of the Bethlehem Loading Co., the T. A. Gillespie Loading Co., the DuPont Engineering Co. and the Atlantic Loading Company. Of these the plant of the Atlantic Loading Company is the largest. It is located at Amatol, New Jersey—a town which came into being to house its workers, and is about 25 miles from Atlantic City, adjacent to and north of the Pennsylvania and the Reading railroads. The site consists of a tract of approximately 6,000 acres of land, with its western boundary about six miles east of Hammonton, New Jersey.
+
+The history of the Atlantic Loading Company is a story of organization, construction and production in quick-step time. It entered into a contract with the Ordnance Department of the Government to act as its agent in loading and storing shell, and it conducted its work and enterprise from first to last in accordance with the rules and regulations of that department. It began the work of construction on its plant on March 4, 1918, began operations the following July, and in August loaded its first shell, and in the meantime it also had built the new town of Amatol. An indication of the high speed with which its operations were conducted may be found in the fact that within twenty-four hours after the site was finally determined upon, actual work on clearing the land for the plant was under way.
+
+The enterprise combined two separate and distinct undertakings, either of which in itself would require an organization embracing high skill, initiative and intensive working power. One was the rapid construction of a large shell loading plant, the other the building of a town to provide proper quarters for the thousands of workers whose employment was contemplated. To meet the requirements of the Ordnance Department the plant had to be brought to a producing basis at the earliest day possible, and to do this the town had to be built and made ready to house the workers at the same time.
+
+It was in contemplation of this that the Atlantic Loading Company was incorporated under the laws of the State of Maine in December, 1917. The stated purposes of the corporation were: first, to construct and operate a shell loading plant for the production of completed rounds of ammunition and to provide the necessary storage capacity therefor; second, to build a town for the housing of the operatives. The plant was designed to be the largest of its type in the country, providing for the loading of shell of all sizes from 75 mm, to 10-inch drop bombs, depth bombs, rifle grenades, hand grenades and boosters. The charter provisions were very broad, in order to permit the Company to enter into contracts for construction of any and all kinds, such as steam and electric railroads, manufacturing plants, electrical transmission lines, power developments, buildings and bridges.
+
+The Atlantic Loading Company is the tri-party control of O. J. Salisbury, of Salt Lake City, Utah; J. D. Evans, of the Evans Engineering Corporation; and the Electric Bond & Share Company. Both Mr. Salisbury and Mr. Evans were fully equipped for the great undertaking, having had long and varied experience in the financing and creation of extensive industrial developments, mining operations and public utility enterprises. The Electric Bond & Share Company is known as one of the country’s most successful companies engaged in the financing and operation of public utilities.
+
+The first task of these three interests was to create the organization needed for the new work. As it stands to-day, the organization of the Atlantic Loading Company covers all the various phases of its work, including finance, male and female employment, accounting, engineering, purchasing, construction, operating, housing, commissary, medical work, sanitation and welfare. In all of these departments the greatest efficiency has been developed.
+
+At the beginning of March, 1918, the site of the plant was an unbroken tract, mostly wooded, with some acres of swamp. The land was of a kind peculiarly difficult to clear for building construction, owing to the dense, tangled nature of the growth. Nine months later it was covered with a plant which has turned out ammunition of many types in large quantities, including drop bombs and large shell; and in addition a town capable of properly housing over 10,000 people, with the many needed buildings for administration, auxiliary operation, recreation, etc., has been built.
+
+At the outset it was necessary to obtain carpenters and other workmen, lumber, commissary outfits and supplies. Within the first week the first bunkhouse and mess hall were up, housing and feeding an initial force of forty men. From the beginning the work expanded with ever-increasing rapidity, buildings going up almost over night. The speed in construction may be gauged by the fact that, during a period of nine months, the Company constructed an average of about four buildings of various kinds a day, from construction office up to such large structures as loading, administration, mess and dormitory buildings.
+
+Besides the building construction for plant and town there was a great amount of auxiliary construction, consisting in part of about fifty miles of standard gauge railroad track, water supply, sewerage systems, thirty miles of 66,000-volt transmission line and other power systems, telephone and telegraph systems, centralized heating plants and electric-lighting stations. It was because that the rapidity with which the plant was placed under way was in a large measure fundamental to the fact that the living conditions and the town were fundamentally correct. “Speed—simplicity—results” were the watchwords in the construction of plant and town, but nevertheless all structures were substantially built.
+
+Semi-fire-proof construction of stucco and “Composite” metal unit was determined upon; and it is an interesting fact that this durable type of building was successfully used at almost the same cost as ordinary cantonment construction—very little in excess of the cost of wood and, in many cases, cheaper. The use of fabricated steel structures, assembled in panels at the factory, facilitated erection and aided in the “record” completion of the 75 mm plant. Standardized unit “A” frame steel structures were also used. An inspection of the accompanying photographs will indicate the elasticity of this standardized construction. The units being bolted together, the structure can be wrecked and readily converted into a large variety of manufacturing buildings. This steel construction was adopted because of the salvage value of the material.
+
+The fact that stands out most sharply in connection with this vast enterprise is that while the Company has built substantially, it has also built quickly. Precisely what this has meant in physical construction is shown by the concrete figures given in the following statistical table:
+
+These statistics cover the development as planned. The signing of the armistice caused the suspension of construction work and also some result some work for which material was purchased and delivered was not completed. About 90 per cent. of the construction was finished and in addition the actual loading of shell had been carried on for several months.
+
+Loading operations began July 31, 1918.
+
+First shell loaded (75 m. m. and drop bombs) August 3, 1918.
+
+AREAS
+Total acreage of reservation: 6,000
+Acreage of operating plant: 2,550
+Acreage of loading company town: 1,000
+Acres cleared in general: 3,680
+Acres cleared in town: 1,150
+Acres trimmed in town: 255
+
+DISTANCES
+Extreme length of plant: 2 miles
+Extreme breadth of plant: 2 miles
+Extreme length of town: 1.5 miles
+Extreme breadth of town: 1 mile
+Length of protective fence: 15 miles
+
+WATER SUPPLY AND SEWERAGE SYSTEM
+Water supply system max capacity: 1,750,000 gals.
+Water mains—town: 9 miles
+Water mains—plant: 20 miles
+Water tanks 50,000 gals.—plant: 6
+Water tanks 50,000 gals.—town: 1
+Water tanks 10 ft. × 10 ft.—plant: 3
+Wells—town: 7
+Wells—plant: 3
+Sewer mains—town: 11 miles
+
+LIGHT AND POWER SYSTEMS
+Steam-electric station—plant: 1
+Steam-electric station—town: 1
+Lighting and power wire—plant: 200 miles
+Lighting and power wire—town: 50 miles
+66,000 volt transmission system: 30 miles
+(Atlantic City line 23 miles; Mays Landing line 7 miles)
+Electric street lights—town: 130
+Yard light—plant: 300
+Lights for fence protection: 400
+Searchlights: 6
+
+HEATING SYSTEMS
+Mains—plant: 13 miles
+Mains—town: 2 miles
+Steam heating stations—plant: 5
+Steam heating station—town: 1
+
+RAILROADS
+Total ultimate length of track: 50 miles
+Locomotives: 10
+Passenger coaches: 30
+
+ROADWAYS
+Miles of roadway—plant: 18 miles
+Miles of roadway—town: 14 miles
+Wood walks—plant: 1 mile
+Wood walks—town: 4 miles
+
+TELEPHONES
+Exchanges: 2
+Trunk lines: 10 miles
+Telephones—plant and town: 385
+Ultimate capacity: 1,300 lines
+Wire in plant: 25 miles
+Wire in town: 25 miles
+
+STRUCTURES
+Floor area in sq. ft.—plant: 2,615,662
+Floor area in sq. ft.—town: 778,822
+Plant buildings placed end to end would cover: 11 miles
+Town buildings placed end to end would cover: 4 miles
+Total number of structures: 1,107
+Plant structures: 642
+Town structures: 465
+Loading buildings: 132
+Storage buildings and magazines: 159
+Administration buildings: 4
+Office buildings: 6
+Industrial buildings: 9
+Hospitals: 7
+Recreation centres: 2
+Mess halls: 12
+Garages: 4
+Warehouses: 7
+Railroad structures: 6
+Stables: 4
+Guardhouses, sentry boxes, searchlights, etc.: 10
+Commercial stores: 21
+
+Structures (continued)
+Dormitories and bunkhouses—male: 98
+Dormitories—female: 21
+Miscellaneous buildings: 140
+Army barracks: 24
+Y.M.C.A.'s: 4
+Individual residences: 11
+Multiple houses: 33
+Workmen’s houses: 227
+Post office: 1
+School house: 1
+Fire houses: 2
+Tent tops: 444
+Family apartments—two rooms: 96
+Family apartments—four rooms: 179
+Family apartments—three rooms: 23
+
+MISCELLANEOUS
+Steel required for plant buildings: 6,000 tons
+Square feet of plaster board: 1,350,000
+Square feet of “Composite” metal lath: 4,000,000
+Ft. B.M. lumber: 30,000,000
+Squares of ruberoid: 27,200
+Square feet of stucco: 3,550,000
+Power driven belt conveyors: 12 miles
+Conveyor housing: 5 miles
+Fire alarm wire—plant: 40 miles
+Fire alarm wire—town: 12 miles
+Average buildings built per day: 4
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p014-018
+  section: Scope Of The Work
+  file_path: amatol/books/amatol_book/p014-018__scope-of-the-work.txt
+  citation: Amatol Book, 1918, pp. 014–018, Scope Of The Work
+
+=== File: amatol/books/amatol_book/p225__town-administration.txt ===
+Page Content:
+Town Administration
+
+TOWN ADMINISTRATION
+
+The administration of the town of Amatol is under the direction of the Town Manager, whose office and duties correspond to those of a mayor or chief burgess. Under him are the various operating divisions headed by the Town Superintendent, the Renting Agent and the Commissary Superintendent. Their work broadly covers the operation and maintenance of those public utilities associated with the town—housing and renting, town accounting, education and the commissary management of the entire development for the plant as well as for the town.
+
+During the construction period the commissary came under the jurisdiction of the Town Superintendent, but when the various divisions of public service were completed and turned over to the town management for operation, the commissary became a separate division reporting directly to the Town Manager.
+
+The duties of the Town Superintendent include the important subdivision of housing of mechanics and laborers, police and fire protection, maintenance and operation of the water supply, sewerage system, town lighting, steam heating, garbage disposal and sanitation. The sanitation of town and camps is being conducted under the direction of the Chief Surgeon and a sanitary engineer, who report weekly on sanitary conditions.
+
+The country-wide influenza outbreak in 1918 added a big load to the health and sanitation work, more particularly because of the fact that many employees lived outside the town. The importance of uninterrupted production in the various plants made this work vital. Upon direct comment by one of the highest medical department authorities on the methods of the influenza epidemic the total cases reported from the army for the month of October was 500,000, with 26,000 deaths. The deaths from influenza during the three months here were only 15 or the 2.02 per cent. of a population of 570. Of the persons who died with influenza, the majority were people coming locally to the reservation from infected districts. These cases usually developed within 48 hours of their admission to the hospital and it is believed that they were infected before coming to the reservation.
+
+There is, of course, a large amount of garbage from the various mess halls operated by the Company, and that this may not be wasted there has been installed a piggery with 300 hogs of which about 100 are finely bred. About 3,500 pounds of garbage is collected daily and after being hauled to the piggery, which is in an outlying district, it is heated in a large steam kettle to sterilize any uncooked food before being fed to the hogs.
+
+Included also among the operations under the direct supervision of the Town Superintendent are the ice plant, having a capacity of 30 tons a day, and a large fully equipped laundry, capable of meeting the entire requirements of both town and plant, including the cleaning of the special clothing used by plant operatives.
+
+Town police and fire department come within the province of the Town Superintendent. The town police are distinct from the military police, having to do with the oversight and protection of civilians, whereas the duties of the military police have to do with the soldiers only. The fire department is similar in its organization to that of any town or municipality and has complete fire fighting equipment.
+
+The Commissary Superintendent has had a very difficult undertaking feeding as many as 15,000 employees in the single day reported. In addition to the regular meals in large blocks of troops, on very short notice, meals have had to be prepared for these forces. To illustrate, between October 7th and 10th, 2,600 soldiers were brought in and had to be fed and housed, thereby taxing the resources of the commissary and the housing division to the utmost. Officers of these troops commented that there was no man who did not have three hot meals a day and a bed. Soldiers to the number of 3,800 have been fed in a single day.
+
+The various mess halls, including those for girls, the staff, soldiers and laborers’ messes, supplied in a single day between 15,000 and 20,000 meals. During the month of October between 15,000 and 20,000 meals were furnished every week. Virtually all the meals are served on the plan of the cafeteria system and the halls are equipped in the most thorough way for efficient and prompt service.
+
+A kindergarten and graded school is maintained for the children of the town.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p225
+  section: Town Administration
+  file_path: amatol/books/amatol_book/p225__town-administration.txt
+  citation: Amatol Book, 1918, p. 225, Town Administration
+
+=== File: amatol/books/amatol_book/p181-182__the-town-of-amatol.txt ===
+Page Content:
+The Town Of Amatol
+
+THE TOWN OF AMATOL
+The town of Amatol, which is named after one of the explosives used in the plant, covers a tract of about 350 acres lying to the northeast of the plant. A distance of upward of two miles separates the closest points between town and plant.
+
+The town is located on a natural eminence, a few miles distant from the famous New Jersey coast resorts and is within the territory that comes under the influence of the Gulf Stream. The wood growth is largely the pines that have given to this section its reputation for healthfulness; and in clearing the land for the town, most of these trees, together with oaks, have been left standing.
+
+The industrial section of the town was made a long, narrow block reaching well in toward the center, and in this was built one branch of the railroad, all of the warehouses, the material storage yards, garages, heating plant, laundry, wood working shop and similar commercial structures.
+
+The impression given by a first view of Amatol is that of a well-kept suburban settlement. The town was not thrown together merely to put roofs and walls around its working people at night, but was built to keep its population satisfied with its surroundings and living conditions and tuned for the rapid production for which the establishment was designed.
+
+The town was planned on a basis of a possible population of 25,000. The houses were designed for speedy construction, yet planned to resist weather—the quickest, most economical construction capable of affording comfort and protection.
+
+The first impressive view of Liberty Court as one enters the town through West J Street is the keynote of the complete scheme. In the planning of the town thought was given to its general attractiveness as well as to the quick housing of its people. It was designed to be a town rather than a group of buildings without idea of symmetry. The rule of about twelve houses to the net acre—that is, land, excluding road—was generally adopted as the ideal spacing to afford ample room for gardens, to prevent an appearance of crowding and to minimize the fire risk. Besides this, provision was made for extent of outlook by arranging breaks in the street lines, by setting the houses back or placing them around courts and by planning roads to give a command of a distant view or to lead on to open spaces.
+
+In the planning of roads attractiveness was sought throughout. Around the central part of the town extends an oval-shaped roadway about 800 feet in length and across this runs a central parkway. This has the advantage of breaking the vistas and of giving an always changing view.
+
+It is doubtless for this reason, in part, that the first impression of the town, with its stucco buildings, is that it was constructed for permanence. Unlike most quick-operation towns there is none of the hit-or-miss appearance, but, instead, a harmonious effect in every feature.
+
+The housing facilities may be roughly grouped as follows: dormitories, residences, multiple houses, workmen’s houses and bunkhouses.
+
+Of the women’s dormitories the largest group or unit was planned to accommodate 800. The largest single dormitory built for women has 150 single rooms. There are three classes of women’s dormitories, namely, one for plant operatives, a second for women office help and the third for the women inspectors. These have accommodated up to 1,000 working people from these three classes.
+
+A good illustration of this class of structures is the girls’ dormitory for the use of office workers. Dignified, yet simple in its exterior, it is arranged throughout for comfortable living. A big living room, 60 feet in length, has a fireplace at each end and simple but attractive furnishings. The room includes a piano, long tables, lounges and easy chairs, and leading from it are numerous little alcove rooms for entertaining.
+
+The building is “H” shaped, its center being given to the living room, a sun parlor and general rooms, while its two side wings contain the dormitory rooms, each for one occupant only; and its furnishing includes bed, bureau, table and chair. There is a complete laundry with drying apparatus, as well as a diet kitchen, infirmary and shower. It would, indeed, be difficult to design a building better suited to its purposes, comfortable in its construction and within its walls all the accessories for the proper housing of its occupants. This building, affording living facilities for 150 girls, may well be termed a model of its class.
+
+All dormitory buildings have complete toilet arrangements and showers. The bunkhouses also are fully equipped in this respect. Many have telephone service, which connect with all offices, mess halls, dormitories, etc.
+
+Of the various mess halls, the largest, the general mess hall, has a seating capacity of 800 in each wing, or 1,600 in all. In it, 6,000 people can be served in an hour. The staff mess hall, with a seating capacity of 450, has served 700 persons at one meal, the service being on the cafeteria system.
+
+The houses are of three general classes—single residences, workmen's houses and multiple-type houses. The residences have from six to nine rooms, the workmen's houses from two to five rooms, and the multiple houses from four to six rooms. All are steam-heated, underdrained and have modern toilet arrangements, including shower baths. Other types, varying in the number of rooms from four to eight, are projected.
+
+The general office building, 200 feet in length, has 32 offices. Adjacent to it are the various other town administration buildings.
+
+One projected group of buildings, some completed, others moving towards completion, is a Y. M. C. A. unit, including swimming pool, gymnasium with stage, bowling alley, billiard rooms and refreshment and lounging rooms.
+
+While the general residence section centers about Liberty Court, with its commercial shops and its commodious theatre, the offices occupy an area by themselves.
+
+Building Methods and Comfort
+The method of construction of the buildings is, generally speaking, cement stucco on a composite metal lath, sometimes called "brick lath." This lath is a mesh of steel wire, upon which brick clay has been pressed and baked so as to enclose the wire in brick or terra cotta while leaving the fabric flexible. It comes rolled in strips 40 inches in width and 16 feet in length.
+
+In the wall construction, the composite lath is nailed to the studding, which has previously been covered with a layer of weatherproof paper. The lath is then covered with stucco in the regular manner and the surface is finished. This wall construction gives an air space of four inches which provides effective insulation, making the buildings warmer in winter and cooler in summer.
+
+The interior partitions are plaster curtain walls, and, while their thickness is but 1½ inches, they have the necessary strength and the advantages of the standard wood partition. This means a saving of all studding and more floor room, giving a very great advantage in both economy and speed.
+
+Female Employment and Morale
+One significant indication of the wisdom of building in a way to satisfy the standards of living of employees is given by the records of female employment. In the earliest stages of construction, when the housing conditions were limited and incomplete, the turnover of help among the women was considerably greater than it became when the dormitories were completed and equipped and the various phases of welfare work, such as recreation and entertainment, were fully organized. Indeed, through all departments the morale of the employees steadily improved and production quickened with the advancing improvement in living conditions until both reached the highest stage with the completion of housing quarters and facilities.
+
+Closing Reflection
+The history of this community has again demonstrated that American labor wants not merely to exist, but to live; that upon living conditions is dependent enthusiasm for work; that to house workmen in buildings that are not both attractive and comfortable is a fundamental error.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p181-182
+  section: The Town Of Amatol
+  file_path: amatol/books/amatol_book/p181-182__the-town-of-amatol.txt
+  citation: Amatol Book, 1918, pp. 181–182, The Town Of Amatol
+
+=== File: amatol/books/amatol_book/p135-136__plant-operation.txt ===
+Page Content:
+Plant Operation
+
+PLANT OPERATION
+In mountainous countries where precious metal ores are milled or smelted at the mines the works are built if possible on the side of a hill, so that the ore enters at the top and descends by the aid of gravity until it reaches the last process at the bottom. A similar plan to minimize the handling of shell was devised by the Atlantic Loading Company and put into successful use at the Amatol works. Instead of the force of gravity, power belt conveyors are used, and these conveyors carry the shell from the receiving building through all successive processes until they are delivered, finished at the end of the unit for shipment. The conveyors are also great time savers and are one of the principal factors for speedy production. They consist of endless belts riding on fixed rollers in narrow tramways, laid on the floors or on the level of the working benches. The total length of the conveyor lines is 12 miles.
+
+Shell Journey on the Conveyor
+The journey of a shell along the conveyor line in any of the units is an interesting demonstration of the time and labor-saving nature of the device. Whether the shell be large or small, it is placed lengthwise on the conveyor belt and moves along at a constant speed to the next process. When it reaches the proper point a workman stationed there simply rolls it off the belt on the bench. At practically no time is it necessary to lift the shell at all, the workman rolling it along flat as he does his task to another workman, who does his particular job and either passes it along by rolling or rolls it back on the conveyor, which carries it to the next process. In the case of large, heavy shell this method not only saves time, but a vast amount of physical exertion.
+
+Initial Shell Preparation
+In the receiving building the shells are received, cleaned and shellaced. Empty shell storage space is here provided for 15 to 20 days' production. When received at the plant the shell have their copper or metal shipping gags screwed in the nose, and the first process is the removal of these plugs. This is a machine operation. The remover heads are placed at a revolving shaft, and the men engage the plug and unscrew it.
+
+Sequential Processing
+From the receiving building the shell are carried forward to each successive stage on conveyor lines, which finally converge in the packing and shipping building.
+
+Amatol, which is the main charge pressed into the shell (unless straight trinitrotoluol (T.N.T.) or a 50/50 mix is used) contains 80% ammonium nitrate and 20% T.N.T.
+
+Mixing Ammonium Nitrate and T.N.T.
+The ammonium nitrate is crushed and dried before mixing. The T.N.T. is melted and the two are mixed in the kettle room. The kettles have hot water jackets, heated by a steam coil within the jacket, and each kettle is provided with an agitator. The total charge of a kettle is about 800 pounds, and a melt is obtained every two hours. When a mixture is used the amount of T.N.T. needed is first melted in the kettle and then hot ammonium nitrate is added until a full charge of proper proportions is obtained.
+
+When T.N.T. is poured, the material is drawn off into stirring tubs. Stirring is necessary because of the rapid crystallization of T.N.T. when cooling begins, which might cause exudation in the charge. The material is therefore stirred with wooden paddles to break up the large crystals into smaller crystals and give a more even charge. The stirring tubs are mounted on wheels and move along tracks to the shell. The empty shell dies, before the pouring process, are brought to the pouring house and filled with hot sand to expel the air. The solution is sprayed on the inside shell by a spray nozzle. They are wheeled to the pouring conveyor, passing through a special gate, which also heats the shell and allows them to run automatically into the pouring process. The shells bodies are run into the pouring building on specially heavy conveyors. A rubber tube is placed in the nose of each, through which the charge is poured in small quantities to prevent holes forming in the loading. In the case of 75 mm shells, they need be only one pouring.
+
+When straight T.N.T. is used the method of pouring is slightly different. A short hose, however, is poured into the body of the boulder and then straight T.N.T. is poured to the top of the funnel. This method permits extremely rapid production. The portion of the explosive in the funnel is termed the “pouring head" and the purpose of filling above the shell is merely that the point of extreme crystallization, which takes place rapidly when the explosive is exposed to air, may be above the outside of the shell itself.
+
+To further reduce the possibility of cavitation when 50/50 is poured, a metal wire is thrust into the shell charge just after the pouring, and withdrawn in a few seconds; this having a tendency to make crystallization uniform throughout. Results have shown that this produces a charge of even texture and of the specified density.
+
+After the charge is poured the "pouring head" is removed and re-used later, the use of a 50 per cent. proportion being permissible, provided it is within 48 hours of the original pouring.
+
+The shell now go to the cooling room where they are stored for eight or nine hours until completely cooled. They are then drilled to receive the booster and the thread is thoroughly cleaned to remove all explosive that may have collected. The cavity for the booster is next shellacked to waterproof it in the event that the booster is not placed immediately. This, however, is not necessary if the booster is inserted at once.
+
+The cartridge case is filled with smokeless powder, the latter being weighed with automatic weighing machines. Shell bodies and cartridge cases then go to the assembling building, where they are partly assembled by hand and finally crimped together in the assembling and crimping machine. Gauging and weighing come next in the operation of making the shell ready for the booster. The shell is now to go to the building where the booster, which detonates the charge, is placed in the cavity drilled for it. The booster is a steel case charged with tetryl. The shell now go by conveyor to the packing shed, and thence to the shipping building.
+
+An important intermediate stage is the stenciling of the shell, so that the gunner may know by the marking in what zone it will fall. Throughout the process of handling the shells, Government inspectors keep watch on all operations. It is the purpose that the progress of the shell throughout the plant shall be continuous, both for speed in expediting the work and, so far as possible, storage at any of the various stages.
+
+While the pressure of war needs was on, it was necessary to load amatol rather than straight T.N.T. Owing to the impossibility of obtaining T.N.T. in sufficient quantities the mix with ammonium nitrate was at the time imperative. The mix has as high explosive power as T.N.T., the one disadvantage of using it being that ammonium nitrate absorbs moisture rapidly, and in time deteriorates. The life of the shell loaded with straight T.N.T. is indefinite—certainly 25 years—while the condition of shell loaded with amatol would be uncertain after perhaps five years. In loading, every possible precaution, such as shellacing, is necessary to exclude moisture when amatol is used. The plant loads straight T.N.T. when adequate supply is obtainable.
+
+As it leaves the plant the shell is complete, except for the placing of the fuse, an operation which is done at the battlefront.
+
+In the matter of protection, the plant has been covered in many respects beyond the usual means of care to lessen risk. The operating buildings are practically all steel-frame with composite lath and cement construction or corrugated metal sides. Hydrants are placed inside and outside the building in such position that all parts can be covered with water. One hundred feet of hose is provided for each outside hydrant. Hose racks are placed in the buildings at short intervals and fire buckets 20 feet apart. A water line points out all hydrants and the location of hose, and a water line is carried completely around the plant. There is a constant system of inspection of buckets and apparatus.
+
+In the matter of cleanliness and sanitation generally the plant operation in the matter of cleanliness was none too moderate. Operating rooms were thoroughly and rigidly inspected by a special force whose duty it was: the purpose being not to let it pile up and then dispose of it, but actually to prevent accumulation. Buildings where T.N.T. is poured were kept under constant cleaning and are flushed out with steam daily. Exhaust apparatus removes dust from the atmosphere.
+
+A safety patrol was maintained whose duty it was not only to take care of waste, but to remove any operative whose health became impaired.
+
+Personal cleanliness among operatives was required by constant watchfulness on the part of nurses and Government inspectors. The nurses and matron in charge of T.N.T. treated dust as a deadly poison and took care of it as such. Women operatives working on T.N.T. Besides this the matron and physicians took care of hygiene, weeding out unfit workers. Men, as well as women, were examined. Medical expert make frequent inspections not only to supervise matters of hygiene, but to remove any operative whose health becomes impaired.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p135-136
+  section: Plant Operation
+  file_path: amatol/books/amatol_book/p135-136__plant-operation.txt
+  citation: Amatol Book, 1918, pp. 135–136, Plant Operation
+
+=== File: amatol/books/amatol_book/p061-062__the-plant.txt ===
+Page Content:
+The Plant
+
+THE PLANT
+The Atlantic Loading Company's plant was designed to load more than 25 percent of the entire amount of shell that the Ordnance Department had placed orders for loading, assembling, and packing. It is organized to produce shell of all types, it is believed, more rapidly and with greater economy than any other plant of its kind in the United States. The men associated in this project have produced all told over 9,000,000 rounds of ammunition of various types.
+
+Briefly, the operations of the plant consist of loading, assembling and packing fixed ammunition. The shell is loaded with trinitrotoluol (T.N.T.), or T.N.T. and ammonium nitrate, the cartridge cases are filled with smokeless powder and the booster, which finally detonates the main charge, is placed in the nose of the shell.
+
+To carry through these operations with the least possible danger and with the speed required by needs of war the most perfect organization, methods and equipment were required, and the record production of the plant is clear proof that this was fully accomplished.
+
+The loading plant is as follows:
+75 mm/m: 3 units
+4.7-inch: 1 unit
+155 mm/m: 50/50 (T.N.T. and ammonium nitrate): 2 units
+155 mm/m: 80/20 (80% ammonium nitrate, 20% T.N.T.): 3 units
+8-inch (and larger): 3 units
+Booster: 1 unit
+Rifle grenade: 1 unit
+Hand grenade: 1 unit
+Total capacity: 60,000 shell (all sizes) and 125,000 small parts, such as boosters and grenades per day.
+Shortly after the plant began producing the 4.7-inch unit, it was extended to loading of Mark III and Mark I drop bombs.
+
+DATA ON HIGH EXPLOSIVE SHELL
+Size	Weight Empty	Charge	Weight Loaded	Length
+3 in.	11.73 lbs.	1.65 lbs	15.00 lbs	11.49 in
+75 mm A.A.	10.24	1.67	15.00	10.70
+75 mm M.I	10.24	1.65	15.00	10.79
+75 mm M.XI	12.00	0.77	12.18	11.56
+75 mm M.XII	13.66	0.87	14.56	13.62
+75 mm M.XIII	14.22	0.85	14.85	13.62
+4.7 in. M.I	33.56	6.25	39.81	17.63
+6-in. M.I	72.65	13.67	86.32	22.71
+155 mm M.XIV	79.35	13.12	95.00	22.70
+155 mm M.XVII	79.35	13.67	95.00	22.70
+155 mm M.XVIII	79.35	13.17	95.00	22.70
+155 mm M.XIX	79.35	13.17	95.00	22.70
+8-in. M.I	199.48	49.42	250.00	29.06
+8-in. M.II	199.48	49.42	250.00	27.94
+240 mm M.I	429.02	86.32	510.00	44.29
+
+EXPLOSIVES REQUIRED FOR 24-HOUR DAY
+Plant	Capacity (No. of Shells)	Shell Type	Charge (lbs)	Total T.N.T. (lbs)	Ammon. Nitrate	Misc.
+75 mm	30,000	T.N.T.	0.75	97,500		
+4.7 in.	10,000	50/50	6.04	30,450	30,450	
+155 mm 50/50	6,000	50/50	7.75	46,500	46,500	
+8-in. 80/20	3,000	80/20	49.67	29,802	119,208	
+Booster	125,000			26,904		107,616
+Hand Grenade	50,000			Tetryl		6,150 lbs
+Rifle Grenade	20,000			Nitro-starch		6,750 lbs
+2,600 lbs
+
+Note:
+
+The first unit placed in operation was for the loading of 75 mm shell, operational four months after ground was broken.
+
+Within 30 days thereafter, the unit could have reached a production of 16,000 shell of this type in a day of eight hours. However, on account of Government requirements, this unit was compelled to load both 75 mm shell and aerial drop bombs. An index of the flexibility of the layout was the development of the extruding machine for loading drop bombs with Amatol in the 75 mm plant.
+
+The next unit to start operations was the booster plant; and following this, the 4.7-inch plant.
+
+One of the methods worked out by the organization that has resulted in greater safety in shell production is in the construction of the kettle in which trinitrotoluol is melted. Heretofore, the kettles were steam jacketed and should the pressure reducing valves fail the temperature of the T.N.T., or the 50/50 mix, would reach a dangerous point liable to cause explosion. In the construction used by the Atlantic Loading Company the kettles are water jacketed; that is, the steam pipes are surrounded with water between the inner and outer casings of the double kettle with a vent to the air. It is therefore impossible for the temperature of the mix to become higher than boiling water, and this is well below the danger point of high explosive temperature.
+
+The Company's engineers were the first to use belt conveyors in the production of shell. To turn out shell in large quantity and economically this operation must be one continuous process from the receiving room to the final stage. The conveyors carry the shell continuously from the first stage to the last with a resultant maximum economy of time and labor. No other plant has used the same system of loading as that worked out by the Atlantic Loading Company.
+
+The general plant layout shows the division of the operations in separate buildings in such a way that, should fire or explosion start in one building, the other buildings in which the same operations are done, may still continue at work. In all plants the more hazardous operations instead of being localized in a single structure are carried on in either two or three duplicate buildings. With the cross conveyor system, great elasticity in operation is obtainable in emergency. The buildings are separated from each other by a minimum distance of 200 feet.
+
+There are approximately 642 buildings of all classes required in the plant proper. The following list of those in the 75 mm unit indicate the character of the operating buildings:
+Receiving, cleaning and shellacking buildings
+Pouring and cooling building
+Drilling and cleaning building
+Assembling building
+Packing building
+Shipping building
+Empty box and container storage
+Cartridge case storage building
+Smokeless filling building
+Ammonium nitrate crushing and drying building
+Ammonium nitrate storage building
+T.N.T. storage service magazine
+Smokeless storage service magazine
+Primer magazine
+Booster magazine
+
+The producing units have, of course, a full complement of storage buildings, change houses for the changing of clothing of operatives, warehouses, shops, administration, and other buildings.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p061-062
+  section: The Plant
+  file_path: amatol/books/amatol_book/p061-062__the-plant.txt
+  citation: Amatol Book, 1918, pp. 061–062, The Plant
+
+=== File: amatol/books/amatol_book/p007__introduction.txt ===
+Page Content:
+Introduction
+
+INTRODUCTION
+BY JAMES BLAINE WALKER
+Secretary Public Service Commission, 1st Dist. New York; Author of "Fifty Years of Rapid Transit," etc.
+
+FOR MANY YEARS travelers on the Pennsylvania Railroad, between Philadelphia and Atlantic City, have viewed from the car windows apparently interminable stretches of flat, sandy country covered with a thick growth of scrub oak, small pine trees and a dense undergrowth of brush. Many have speculated as to what practical use this great stretch of land, useless in its present state for agricultural purposes and yet most advantageously located, could be devoted. Quite unexpectedly the necessities of war brought a large portion of it into practical use. The Atlantic Loading Company, a corporation formed in New York City, entered into a contract with the Government to build and operate a shell loading plant as the agent of the Government. The officers of the company immediately began looking for a site for the contemplated plant, and this section of New Jersey attracted their attention. It was comparatively isolated and yet traversed by important railroad lines which afforded ample transportation facilities for men and materials. The soil was easily worked and there was available a subterranean supply of excellent water readily tapped by driving wells. The moderate, healthful and equable climate was also suitable for a large industrial community.
+
+Early in the year 1918 the Company acquired for the Government a tract of 6000 acres of this land lying near the town of Hammonton, New Jersey. The Company began work on March 4th, 1918, and within a few months had cleared the land, laid out and built a new town and an enormous plant, peopled the former with workmen and equipped the latter with machinery and begun the loading of shell. The transformation of the wilderness into a hive of industry within such a short time was one of the many war-time marvels of American engineering achievement. The history of the work is a story of the accomplishment of brain power, engineering talent and the genius of American business organization, which reflects the highest credit upon all concerned.
+
+The leaders in the formation of the Atlantic Loading Company were O. J. Salisbury, of Salt Lake City, Utah, J. D. Evans, of the Evans Engineering Corporation, and the Electric Bond and Share Company, of New York, both of whom have had extensive experience in the financing and construction of large works. The new Company was formed by taking the pick of men from several large organizations, including that of the Electric Bond and Share Company, so that each of its men was made up of experts. This method of selecting suitable men was followed throughout the organization, the financial and administrative chiefs as well as the engineers being picked men.
+
+The new organization having in its personnel many of the pioneers in the quantity loading of high explosive shell, embodied in its plant at Amatol the best, most economical and safest methods which could be devised for facilitating and speeding up production. Some of these methods were developed by the Company's own engineers: the power belt conveyor system, which permits the continuous movement of shell through the various operations within the central loading building, is one feature. The men placed in charge of operating the plant thus brought to the work at Amatol the skill necessary to successful operation. The speed with which the call of the Government was met, the co-ordination of plant and men and the results obtained which provided for every contingency stand out as prominent features of the work.
+
+In the following pages Mr. Hammel, the Company's Chief Engineer, and a Member of the American Society of Civil Engineers, has creditably presented an all-too-brief history of this great undertaking, which includes an interesting description of the plant and the town, their construction, operation, capacity, and the efficient organization which made them possible. It is eminently fitting that a permanent record should be made of the achievements of the Company, which may well be proud of its work, for success never attended a larger undertaking initiated and carried through in such a short time and in the face of so many difficulties.
+
+Amatol, New Jersey
+January, 1919
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p007
+  section: Introduction
+  file_path: amatol/books/amatol_book/p007__introduction.txt
+  citation: Amatol Book, 1918, p. 007, Introduction
+
+=== File: amatol/books/amatol_book/p025-027__organization.txt ===
+Page Content:
+Organization
+
+ORGANIZATION
+"With any large undertaking the keynote to success is organization," and the efficiency of an organization depends upon the correct division of the work in hand among several departments and the proper co-ordination of those departments one with another. In the Amatol project organization was particularly vital because of the rapidity with which the work had to be done and of the many new problems presented.
+
+The very nature of the work required an organization of experts. These were drafted from going concerns engaged in large construction and financial enterprises. Loading shell with high explosives is a hazardous undertaking, and the men who formed the Atlantic Loading Company realized this. They summoned to their aid only men of broad experience along similar lines who had proven their fitness in successful work elsewhere. In an incredibly short time a suitable organization was mapped out and the necessary specialists were recruited to head the several departments.
+
+OFFICERS
+O. J. Salisbury, President & General Manager
+J. D. Evans, Vice President & Operating Manager
+C. E. Groesbeck, Vice President
+G. E. Claflin, Vice President
+A. E. Smith, Secretary-Treasurer
+
+DIRECTORS
+O. J. Salisbury
+J. D. Evans, President, Evans Engineering Corporation
+C. E. Groesbeck, Vice President, Electric Bond & Share Company
+E. K. Hall, Vice President, Electric Bond & Share Company
+G. E. Claflin, Vice President, Electric Bond & Share Company
+
+Simplicity and effectiveness marked the division of the work into departments, each aligned with its function. The staff was as follows:
+
+OPERATING MANAGER'S DEPARTMENT
+Assistant Operating Manager: 1
+Chief Clerk: 1
+Stenographers: 5
+Clerks: 5
+
+ENGINEERING
+Chief Engineer: 1
+Assistant Chief Engineer: 1
+Consulting Engineers: 2
+Resident Engineer: 1
+Assistants to Chief Engineer: 3
+Sanitary and Water Supply Engineer: 1
+Mechanical Engineer: 1
+Electrical Engineer: 1
+Material Engineer: 1
+Development Engineer: 1
+Civil and Structural Engineer: 1
+Consulting Architect: 1
+Architect: 1
+Cost Engineer: 1
+Chief Chemist: 1
+Assistant Chemists: 3
+Engineers and Draftsmen: 7
+Field Men (Instruments, Rodmen, etc.): 65
+Clerks, Stenographers, etc.: 9
+
+CONSTRUCTION
+General Construction Superintendent: 1
+Assistant General Construction Superintendent: 1
+Construction Engineers: 10
+Foremen and Sub-Foremen: 54
+Stenographers, Clerks, etc.: 2
+
+The Company had about 5,500 men on construction work, including all crafts, such as carpenters, plumbers, electricians, plasterers, lathe workers, machinists, boiler makers, painters, teamsters, pipe fitters, riggers, tinsmiths, cement worker, and laborers. In addition, there were about 1,800 enlisted men engaged a portion of the time.
+
+PLANT OPERATION
+Works Manager: 1
+Assistant Works Managers: 2
+General Superintendent: 1
+Chief of Police: 1
+Superintendents: 4
+Foremen and Supervisors: 26
+
+There are also about 1,000 operatives working in the plant, including skilled mechanics of all classes, as well as laborers, both male and female. About 2,000 enlisted men were also detailed to plant operation at various times.
+
+ACCOUNTING
+Treasurer: 1
+Chief Accountant: 1
+Plant Auditor: 1
+Town Auditor: 1
+Accountants, Bookkeepers, etc.: 75
+Clerks, Stenographers, etc.: 200
+Paymaster: 1
+Payroll Clerks: 64
+Time Checkers: 112
+
+INDUSTRIAL SERVICE
+Superintendent: 1
+Garage Manager: 1
+Railway Superintendent: 1
+Chauffeurs: 15
+Locomotive Engineers: 15
+Locomotive Firemen: 15
+Locomotive Brakemen: 15
+Automobile Mechanics: 10
+Chief of Police: 1
+Captains: 2
+Lieutenants: 4
+Guards: 500
+
+There are about 95 passenger automobiles, besides a large number of auto trucks, horses, wagons, etc.
+
+Stenographers, Clerks, etc.: 19
+
+TOWN
+Town Manager: 1
+Renting Agent: 1
+Town Superintendent: 1
+Commissary Superintendent: 1
+Stenographers, Clerks, etc.: 24
+Commissary Heads: 3
+Cooks: 39
+Assistant Cooks and Kitchen Help: 247
+Waitresses: 18
+Between 15,000 and 20,000 meals are prepared and served daily.
+
+HOSPITAL
+Physicians: 6
+Orderlies and Nurses: 13
+Clerks: 1
+
+PURCHASING
+Purchasing Agent: 1
+Assistant Purchasing Agent: 1
+Buyers: 10
+Clerks and Stenographers: 21
+Expeditors: 16
+
+MALE EMPLOYMENT
+Employment Superintendent: 1
+Employment Agents: 2
+Clerks, Stenographers, etc.: 15
+
+FEMALE EMPLOYMENT AND WELFARE
+Superintendent: 1
+Assistants: 3
+Housekeepers, Matrons, etc.: 30
+
+The above classification gives the framework of the organization and indicated the distribution of the work. It does not, however, and in the nature of things could not, disclose the character of the problems faced by the several departments and successfully evolved. It is impossible to describe these in detail, but a few illustrations will give the reader a better idea of the difficulties which were met and surmounted. 
+
+Construction naturally was the first thing on the programme. In all construction the two main factors are labor and materials. Even in normal times these factors are difficult problems in any large undertaking. In the early part of the year 1918, with the whole country absorbed in war work and with normal conditions completely upset, they presented ten-fold more difficulties. To get labor with which to build its plant and town the Company was compelled to go into a labor market booming from unprecedented demand and to bid against high wages in all industries. But the problem was solved by making the work attractive and providing the best living and housing conditions for the workers.
+
+To get the materials with which to build was no less difficult. Those were the days of unlimited demand and undeveloped supplies, of congested freight carrying facilities and Government priority orders for shipments. It was easy to order supplies, but quite another matter to get them. The purchasing department of the Company rose to the emergency by organizing a special expediting division. This division dispatched men to various seats of supply, such as the lumber mills of the South, and these men followed the orders placed by the Company until the materials were turned out and shipped. Other men experienced in freight shipping were stationed at junction points to set shipments straight and give advance notice of their coming. This expediting service brought results, and at the high point of operations the Company had no less than 700 cars of material in transit at one time. Simultaneously the construction was moving steadily and uninterruptedly.
+
+Purchase of supplies necessarily was made on a vast scale to meet the demands of these several departments, totaling many millions of dollars during the period of eight months. The purchasing department, in order to do this work, had a force of 300 persons engaged at one time. These included the office in Philadelphia, where purchases were made, and that at Amatol, where the traffic and the routing of shipments and invoices were handled.
+
+New problems also confronted the financial and accounting department. As the Company was acting as agent of the Government it was necessary for the treasurer’s office to make the complex accounting and auditing systems synchronize with those of the Government. This was successfully done and the payrolls and disbursements of funds were made to conform with Government requirements. It was accomplished by a system of invoice accounting, checking materials and the final approval and payment of invoices through the Government disbursing office. All records of such disbursements were carried into the Company’s field account and corresponded exactly with the records of the Government’s accounting division. Payroll disbursements also were made in accordance with Government requirements as to checking of time, distribution of labor costs and proper disbursement of funds. No question as to payrolls ever arose between the Company and the Government—a fact in which the Company may feel a degree of pride. Accounting methods also were made to fit the special requirements of the plant and town operations.
+
+In every other department similar problems were presented and successfully solved, and they would not have been possible had it not been for the character of the personnel, so admirably fitted for the work. In the construction department the Company has had in its service some of the best men known to organizations having wide experience on many of the largest pieces of construction throughout the country.
+
+On its engineering staff it had men with special experience in hydro-electric and other extensive developments. These men were thoroughly familiar with all kinds of material, all phases of construction work and had behind them command data collected through years of important development work. Associated with them as consultants were Clinton D. Mackenzie, Consulting Architect, and Clyde Potts, Consulting Engineer on sewerage and water.
+
+The work of the Women’s Department went on and women, was made very difficult, because of the shortage incident to the demands made upon them by the abnormal war industrial activities. Admirable results were obtained, particularly by the Superintendent of Women to whom was entrusted the direct direction of the organizations for recreational and communal life, as well as the employment and housing of women.
+
+Metadata:
+  source_type: book
+  source_id: amatol_book
+  source_name: Amatol Book
+  title: Amatol Book
+  author: Victor Hammel
+  year: 1918
+  date: 1918
+  pages: p025-027
+  section: Organization
+  file_path: amatol/books/amatol_book/p025-027__organization.txt
+  citation: Amatol Book, 1918, pp. 025–027, Organization
 

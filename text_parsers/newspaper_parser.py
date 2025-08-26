@@ -42,7 +42,16 @@ def parse_newspaper_article(file_path: str) -> dict:
     page = parts[2]                   # e.g., p5
 
     # --- Step 4: Load attribution patterns ---
-    patterns = load_newspaper_metadata(Path(file_path)).get("default", {}).get("attribution_patterns", [])
+    metadata = load_newspaper_metadata(Path(file_path))
+    patterns = []
+
+    # Get newspaper-specific patterns first
+    if newspaper in metadata:
+        patterns.extend(metadata[newspaper].get("attribution_patterns", []))
+
+    # Add default patterns as fallback
+    if "default" in metadata:
+        patterns.extend(metadata["default"].get("attribution_patterns", []))
 
     # --- Step 5: Parse header ---
     header_lines = [l.strip() for l in header.split("\n") if l.strip()]

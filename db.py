@@ -7,6 +7,19 @@ from datetime import datetime
 DB_PATH: Path | None = None
 PROJECTS_DIR = Path("projects")
 
+def file_sha256_from_buffer(buffer) -> str:
+    h = hashlib.sha256()
+    h.update(buffer)
+    return h.hexdigest()
+
+def file_sha256(path: Path) -> str:
+    """Compute SHA256 hash for file content."""
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
 def set_project_db(project_name: str):
     """
     Set the DB_PATH based on project_name.
@@ -33,18 +46,13 @@ def ensure_db():
         date         TEXT,
         num_chunks   INTEGER,
         content_hash TEXT UNIQUE,
+        status       TEXT DEFAULT 'pending',   -- NEW FIELD
         added_at     DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
     return con
 
-def file_sha256(path: Path) -> str:
-    """Compute SHA256 hash for file content."""
-    h = hashlib.sha256()
-    with open(path, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), b''):
-            h.update(chunk)
-    return h.hexdigest()
 
 def document_exists(con, content_hash: str) -> bool:
     cur = con.execute("SELECT 1 FROM documents WHERE content_hash = ?", (content_hash,))
@@ -54,8 +62,8 @@ def insert_document(con, path: Path, parsed: dict, content_hash: str, num_chunks
     """Insert a new document record with its metadata + chunk count."""
     md = parsed['metadata']
     con.execute("""
-    INSERT INTO documents (path, citation, source_type, source_id, date, content_hash, num_chunks, added_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO documents (path, citation, source_type, source_id, date, content_hash, num_chunks, status, added_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         str(path),
         md.get('citation'),
@@ -64,8 +72,18 @@ def insert_document(con, path: Path, parsed: dict, content_hash: str, num_chunks
         md.get('date'),
         content_hash,
         num_chunks,
+        'pending',
         datetime.utcnow().isoformat()
     ))
+
+def update_document_status(con, content_hash: str, num_chunks: int, status: str = "embedded") -> None:
+    """Update chunk count and status for a document after processing."""
+    con.execute(
+        "UPDATE documents SET num_chunks=?, status=? WHERE content_hash=?",
+        (num_chunks, status, content_hash),
+    )
+    con.commit()
+
 
 def delete_document(con, content_hash: str) -> None:
     """Delete a document row by its content hash."""
@@ -84,6 +102,15 @@ def list_all_documents(con):
     """Return all documents with full metadata."""
     cur = con.execute("SELECT * FROM documents ORDER BY added_at DESC")
     return cur.fetchall()
+
+def list_documents_by_status(con, status: str):
+    """Return all documents with the given status."""
+    return con.execute(
+        "SELECT * FROM documents WHERE status=? ORDER BY added_at DESC", 
+        (status,)
+    ).fetchall()
+
+
 
 if __name__ == "__main__":
     set_project_db("demo_project")
