@@ -10,6 +10,7 @@ from text_parsers.journal_parser import parse_journal_article
 from text_parsers.newspaper_parser import parse_newspaper_article
 from text_parsers.report_parser import parse_report
 from text_parsers.web_article_parser import parse_web_article
+from text_parsers.unsorted_parser import parse_unsorted
 
 # Dispatch table
 DISPATCH = {
@@ -18,6 +19,7 @@ DISPATCH = {
     "newspapers": parse_newspaper_article,
     "reports": parse_report,
     "web_articles": parse_web_article,
+    "unsorted": parse_unsorted,
 }
 
 def parse_file(file_path: str) -> dict:
@@ -27,7 +29,22 @@ def parse_file(file_path: str) -> dict:
     """
     path = Path(file_path)
     try:
-        folder = path.parts[3]  # e.g., "journals" from "amatol/journals/..."
+        # Find the documents folder in the path
+        documents_index = None
+        for i, part in enumerate(path.parts):
+            if part == "documents":
+                documents_index = i
+                break
+        
+        if documents_index is None:
+            raise ValueError(f"Could not find 'documents' folder in path: {file_path}")
+        
+        # Get the folder type (e.g., "newspapers", "web_articles") from after documents
+        if documents_index + 1 >= len(path.parts):
+            raise ValueError(f"Unexpected file structure: {file_path}")
+        
+        folder = path.parts[documents_index + 1]
+        
     except IndexError:
         raise ValueError(f"Unexpected file structure: {file_path}")
 

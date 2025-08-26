@@ -69,7 +69,7 @@ def test_database_updates():
             
         # Clean up test project
         con.close()
-        test_db_path = Path("projects") / project_name / f"{project_name}.sqlite"
+        test_db_path = Path.cwd() / "projects" / project_name / f"{project_name}.sqlite"
         if test_db_path.exists():
             test_db_path.unlink()
             print("✅ Test database cleaned up")

@@ -10,6 +10,7 @@ from text_parsers.journal_parser import parse_journal_article
 from text_parsers.newspaper_parser import parse_newspaper_article
 from text_parsers.report_parser import parse_report
 from text_parsers.web_article_parser import parse_web_article
+from text_parsers.unsorted_parser import parse_unsorted
 
 
 DISPATCH = {
@@ -18,6 +19,7 @@ DISPATCH = {
     "newspapers": parse_newspaper_article,
     "reports": parse_report,
     "web_articles": parse_web_article,
+    "unsorted": parse_unsorted,
 }
 
 def parse_file(file_path: str) -> dict:

@@ -6,7 +6,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
 from langchain.schema import Document
 from pathlib import Path
-from embedder import embed_and_upsert
+from embedder import embed_documents
 
 def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.subheader("⚙️ Process Pending Documents")
@@ -139,6 +139,13 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
         processed_count = 0
         failed_count = 0
         
+        # Initialize batching
+        from local_qdrant import BATCH_SIZE
+        staging_buffer = []
+        batch_count = 0
+        
+        st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")
+        
         for i, row in enumerate(rows):
             # Fix the row indexing - content_hash is at index 6, not 5
             path, citation, source_type, source_id, date, num_chunks, content_hash, status, added_at = row[1:10]
@@ -181,46 +188,44 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
                 doc = Document(page_content=parsed["page_content"], metadata=parsed["metadata"])
                 docs = adaptive_chunk_documents([doc])
                 
-                # Embed and upsert
-                n = embed_and_upsert(docs, project_name, collection_name, str(proj_dir / "qdrant"), content_hash)
+                # Add content_hash to metadata for tracking
+                for chunk in docs:
+                    if chunk.metadata is None:
+                        chunk.metadata = {}
+                    chunk.metadata['content_hash'] = content_hash
                 
-                # Update database status
-                st.write(f"🔄 Updating database status to embedded with {n} chunks...")
-                update_document_status(con, content_hash, n, "embedded")
+                # Add chunks to staging buffer
+                staging_buffer.extend(docs)
+                st.write(f"  📄 Added {len(docs)} chunks to batch (total: {len(staging_buffer)})")
                 
-                # Force a commit to ensure the update persists
-                con.commit()
+                # Flush batch if it's full
+                if len(staging_buffer) >= BATCH_SIZE:
+                    st.write(f"  🚀 Flushing batch of {len(staging_buffer)} chunks...")
+                    try:
+                        # Embed and add batch to vector store
+                        n = embed_documents(staging_buffer, project_name, collection_name)
+                        
+                        # Mark all documents in this batch as embedded
+                        for chunk in staging_buffer:
+                            chunk_hash = chunk.metadata.get('content_hash')
+                            if chunk_hash:
+                                update_document_status(con, chunk_hash, len(docs), "embedded")
+                        
+                        con.commit()
+                        batch_count += 1
+                        st.success(f"  ✅ Batch {batch_count} processed: {len(staging_buffer)} chunks")
+                        
+                    except Exception as e:
+                        st.error(f"  ❌ Batch processing failed: {e}")
+                        # Mark documents as error
+                        for chunk in staging_buffer:
+                            chunk_hash = chunk.metadata.get('content_hash')
+                            if chunk_hash:
+                                update_document_status(con, chunk_hash, 0, "error")
+                    
+                    # Clear the buffer
+                    staging_buffer.clear()
                 
-                # Verify the update worked immediately
-                st.write(f"🔍 Verifying database update for {path}...")
-                verification_query = con.execute("SELECT status, num_chunks FROM documents WHERE content_hash = ?", (content_hash,)).fetchone()
-                if verification_query:
-                    actual_status, actual_chunks = verification_query
-                    st.write(f"  Database shows: status={actual_status}, chunks={actual_chunks}")
-                    if actual_status == "embedded" and actual_chunks == n:
-                        st.success(f"✅ Database update verified for {path}")
-                    else:
-                        st.error(f"❌ Database update failed for {path} - expected embedded/{n}, got {actual_status}/{actual_chunks}")
-                else:
-                    st.error(f"❌ Could not find document {path} in database after update")
-                
-                # Also check using the helper function
-                st.write(f"🔍 Checking with helper function...")
-                pending_after_update = list_documents_by_status(con, "pending")
-                embedded_after_update = list_documents_by_status(con, "embedded")
-                st.write(f"  Pending count after update: {len(pending_after_update)}")
-                st.write(f"  Embedded count after update: {len(embedded_after_update)}")
-                
-                # Check if this specific document is still in pending
-                still_pending = any(row[7] == content_hash for row in pending_after_update)
-                st.write(f"  Document still in pending: {still_pending}")
-                
-                # Check if this specific document is now in embedded
-                now_embedded = any(row[7] == content_hash for row in embedded_after_update)
-                st.write(f"  Document now in embedded: {now_embedded}")
-                
-                # Verify the update worked
-                st.success(f"✅ {path} → {n} chunks embedded (DB updated)")
                 processed_count += 1
                 
             except Exception as e:
@@ -228,15 +233,39 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
                 import traceback
                 st.error(f"Full error: {traceback.format_exc()}")
                 failed_count += 1
+        
+        # Final flush of remaining chunks
+        if staging_buffer:
+            st.write(f"  🚀 Flushing final batch of {len(staging_buffer)} chunks...")
+            try:
+                n = embed_documents(staging_buffer, project_name, collection_name)
+                
+                # Mark remaining documents as embedded
+                for chunk in staging_buffer:
+                    chunk_hash = chunk.metadata.get('content_hash')
+                    if chunk_hash:
+                        update_document_status(con, chunk_hash, len(docs), "embedded")
+                
+                con.commit()
+                batch_count += 1
+                st.success(f"  ✅ Final batch processed: {len(staging_buffer)} chunks")
+                
+            except Exception as e:
+                st.error(f"  ❌ Final batch processing failed: {e}")
+                # Mark documents as error
+                for chunk in staging_buffer:
+                    chunk_hash = chunk.metadata.get('content_hash')
+                    if chunk_hash:
+                        update_document_status(con, chunk_hash, 0, "error")
 
         # Final status
         progress_bar.progress(1.0)
         status_text.text("Processing complete!")
         
         if failed_count == 0:
-            st.success(f"🎉 All {processed_count} pending documents processed successfully!")
+            st.success(f"🎉 All {processed_count} pending documents processed successfully in {batch_count} batch(es)!")
         else:
-            st.warning(f"⚠️ Processing complete: {processed_count} successful, {failed_count} failed")
+            st.warning(f"⚠️ Processing complete: {processed_count} successful, {failed_count} failed in {batch_count} batch(es)")
             
         # Show final database state
         st.subheader("📊 Final Database Status")
@@ -259,6 +288,7 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
         st.subheader("🔍 Database Change Summary")
         st.write(f"Documents processed: {processed_count}")
         st.write(f"Documents failed: {failed_count}")
+        st.write(f"Batches processed: {batch_count}")
         st.write(f"Pending before: {len(initial_pending)}, after: {len(final_pending)}")
         st.write(f"Embedded before: {len(initial_embedded)}, after: {len(final_embedded)}")
         

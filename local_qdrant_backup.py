@@ -20,131 +20,60 @@ import streamlit as st
 # --- Settings ---
 BATCH_SIZE = 12                          # tune for performance
 
-# Global client registry to track active clients
-_active_clients = {}
-
-def _get_client_key(project_name: str) -> str:
-    """Generate a unique key for each project's Qdrant client."""
-    return f"qdrant_client_{project_name}"
-
-def is_client_active(project_name: str) -> bool:
-    """Check if a Qdrant client is already active for a project."""
-    client_key = _get_client_key(project_name)
-    return client_key in _active_clients
-
-def force_close_all_clients():
-    """Force close all active Qdrant clients. Use with caution."""
-    global _active_clients
-    for client_key, client in list(_active_clients.items()):
-        try:
-            client.close()
-            print(f"Closed client: {client_key}")
-        except Exception as e:
-            print(f"Error closing client {client_key}: {e}")
-        finally:
-            del _active_clients[client_key]
-    print("All Qdrant clients closed")
-
-def close_qdrant_client(project_name: str):
-    """Close a specific Qdrant client for a project."""
-    client_key = _get_client_key(project_name)
-    if client_key in _active_clients:
-        try:
-            _active_clients[client_key].close()
-            del _active_clients[client_key]
-        except:
-            pass
-
-def force_clear_qdrant_locks(project_name: str):
-    """Force clear Qdrant locks by removing lock files and waiting."""
-    import time
-    import os
-    
-    project_dir = Path.cwd() / "projects" / project_name
-    qdrant_path = project_dir / "qdrant"
-    
-    if qdrant_path.exists():
-        # Look for lock files and remove them
-        lock_files = list(qdrant_path.glob("*.lock"))
-        for lock_file in lock_files:
-            try:
-                os.remove(lock_file)
-                print(f"Removed lock file: {lock_file}")
-            except Exception as e:
-                print(f"Could not remove lock file {lock_file}: {e}")
-        
-        # Wait a bit for the OS to release any remaining locks
-        time.sleep(2.0)
-        print(f"Force cleared locks for {project_name}")
-
+@st.cache_resource
 def get_qdrant_client(project_name: str) -> QdrantClient:
     """
     Return a QdrantClient for the given project.
     Stores data under: projects/{project_name}/qdrant
     """
-    # Check if we already have an active client for this project
-    client_key = _get_client_key(project_name)
-    if client_key in _active_clients:
-        try:
-            # Test if the existing client is still working
-            _active_clients[client_key].get_collections()
-            return _active_clients[client_key]
-        except:
-            # Client is broken, remove it
-            try:
-                _active_clients[client_key].close()
-            except:
-                pass
-            del _active_clients[client_key]
-    
-    # Create a new client
     project_dir = Path.cwd() / "projects" / project_name
     qdrant_path = project_dir / "qdrant"
     qdrant_path.mkdir(parents=True, exist_ok=True)
     
-    try:
-        client = QdrantClient(path=str(qdrant_path))
-        # Store the client for reuse
-        _active_clients[client_key] = client
-        return client
-    except Exception as e:
-        # If creation fails, try to clear locks and retry once
+    # Try to create client with better error handling
+    max_retries = 3
+    for attempt in range(max_retries):
         try:
-            force_clear_qdrant_locks(project_name)
             client = QdrantClient(path=str(qdrant_path))
-            _active_clients[client_key] = client
+            # Test the connection to ensure it's working
+            client.get_collections()
             return client
-        except Exception as retry_e:
-            raise RuntimeError(f"Failed to create Qdrant client for {project_name}: {retry_e}")
+        except RuntimeError as e:
+            if "already accessed" in str(e):
+                if attempt < max_retries - 1:
+                    print(f"⚠️ Qdrant conflict detected for {project_name}, attempt {attempt + 1}/{max_retries}")
+                    # Clear the cache and wait longer between attempts
+                    get_qdrant_client.clear()
+                    import time
+                    time.sleep(1.0 * (attempt + 1))  # Progressive delay
+                    continue
+                else:
+                    # Last attempt failed, try to force cleanup and retry once more
+                    print(f"🚨 Final attempt for {project_name}, forcing cleanup...")
+                    try:
+                        # Force clear locks and close all clients
+                        force_clear_qdrant_locks(project_name)
+                        force_close_all_clients()
+                        time.sleep(2.0)
+                        client = QdrantClient(path=str(qdrant_path))
+                        return client
+                    except Exception as final_e:
+                        print(f"❌ All attempts failed for {project_name}: {final_e}")
+                        raise RuntimeError(f"Failed to create Qdrant client for {project_name} after {max_retries} attempts: {final_e}")
+            else:
+                # Different RuntimeError, don't retry
+                raise e
+        except Exception as e:
+            # Any other error, don't retry
+            raise e
+    
+    # This should never be reached, but just in case
+    raise RuntimeError(f"Failed to create Qdrant client for {project_name} after {max_retries} attempts")
 
 def clear_qdrant_cache():
-    """Clear the active Qdrant clients to force fresh connections."""
-    global _active_clients
-    for client in _active_clients.values():
-        try:
-            client.close()
-        except:
-            pass
-    _active_clients.clear()
+    """Clear the cached Qdrant clients to force fresh connections."""
+    get_qdrant_client.clear()
 
-def force_clear_all_qdrant_caches():
-    """Force clear all Qdrant caches and connections. Use when switching projects."""
-    # Clear active clients
-    global _active_clients
-    for client in _active_clients.values():
-        try:
-            client.close()
-        except:
-            pass
-    _active_clients.clear()
-    
-    # Force garbage collection
-    import gc
-    gc.collect()
-    
-    # Small delay to ensure OS releases any file handles
-    import time
-    time.sleep(0.1)
 
 # --- Step 1: Recursively find all .txt files ---
 from langchain.schema import Document
@@ -183,6 +112,7 @@ def adaptive_chunk_documents(docs: list[Document], model: str = 'text-embedding-
 
     return out_docs
 
+
 def embedding_dim(embeddings) -> int:
     return len(embeddings.embed_query('dim?'))
 
@@ -204,6 +134,8 @@ def flush_batch(buffer, vs, con):
     con.commit()
     print(f'  Flushed {len(buffer)} chunks → Qdrant')
     buffer.clear()
+
+
 
 # --- Step 5: Main Ingestion ---
 def embed_directory_batched(root_dir: str, project_name: str, collection_name: str, batch_size: int = BATCH_SIZE) -> None:
@@ -257,6 +189,8 @@ def embed_directory_batched(root_dir: str, project_name: str, collection_name: s
     flush_batch(staging_buffer, vs, con)
     client.close()   # releases the file lock
 
+
+# local_qdrant.py
 def view_vector_store(client, collection_name, limit=20):
     points, _ = client.scroll(
         collection_name=collection_name,
@@ -273,6 +207,7 @@ def view_vector_store(client, collection_name, limit=20):
             "page_content": (pt.payload.get("page_content") or "")[:200] + "..."
         })
     return results
+
 
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -295,3 +230,4 @@ def delete_document_from_store(con, client, collection_name: str, doc_id: str) -
     # 2. Delete from SQLite
     delete_document(con, doc_id)
     print(f"Deleted document {doc_id} from DB and Qdrant.")
+

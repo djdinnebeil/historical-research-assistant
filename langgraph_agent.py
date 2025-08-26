@@ -43,18 +43,87 @@ def tavily_search_tool(query: str) -> str:
         return "No web search results found."
 
 @tool
-def historical_rag_tool(question: str) -> str:
+def historical_rag_tool(question: str, project_name: str = None, collection_name: str = None) -> str:
     """Search and retrieve information from uploaded historical documents. 
     Use this tool first for any question to check what historical information is available, 
     then consider using web search to supplement with current information."""
-    # Get the chains dynamically based on current project
-    if "selected_project" in st.session_state and "collection_name" in st.session_state:
-        qa_chain, naive_retriever = get_chains(
-            st.session_state["selected_project"],
-            st.session_state["collection_name"]
-        )
+    
+    # Try to get project and collection from parameters first, then fall back to session state
+    if project_name is None or collection_name is None:
+        print(f"🔍 **Tool Debug:** Parameters not provided, trying session state...")
+        if "selected_project" in st.session_state and "collection_name" in st.session_state:
+            project_name = st.session_state["selected_project"]
+            collection_name = st.session_state["collection_name"]
+            print(f"🔍 **Tool Debug:** Got from session state: {project_name}, {collection_name}")
+        else:
+            print(f"🔍 **Tool Debug:** No project/collection found in session state")
+            return "Error: No project selected or collection name not found."
+    else:
+        print(f"🔍 **Tool Debug:** Using provided parameters: {project_name}, {collection_name}")
+    
+    if project_name and collection_name:
+        print(f"🔍 **Tool Debug:** Querying project: {project_name}, collection: {collection_name}")
+        
+        qa_chain, naive_retriever = get_chains(project_name, collection_name)
         response = qa_chain.invoke(question)
-        return f"Historical documents result:\n\n{response['result']}"
+        
+        # Extract result and source documents
+        result = response.get('result', '')
+        source_docs = response.get('source_documents', [])
+        
+        print(f"🔍 **Tool Debug:** Query: '{question}'")
+        print(f"🔍 **Tool Debug:** Response keys: {list(response.keys())}")
+        print(f"🔍 **Tool Debug:** Result length: {len(result)}")
+        print(f"🔍 **Tool Debug:** Source docs count: {len(source_docs)}")
+        
+        # Return a structured response that includes both result and source information
+        if source_docs:
+            # Format source documents for inclusion in the response
+            source_info = []
+            for i, doc in enumerate(source_docs, 1):
+                citation = "Unknown source"
+                if hasattr(doc, 'metadata') and doc.metadata:
+                    citation = doc.metadata.get('citation', 'Unknown source')
+                elif hasattr(doc, 'page_content'):
+                    content = doc.page_content
+                    if 'citation:' in content.lower() or 'source:' in content.lower():
+                        lines = content.split('\n')
+                        for line in lines:
+                            if 'citation:' in line.lower() or 'source:' in line.lower():
+                                citation = line.split(':', 1)[1].strip()
+                                break
+                
+                source_info.append(f"Source {i}: {citation}")
+            
+            # Return structured response with source information AND debug info
+            response_text = f"""Historical documents result:
+
+{result}
+
+--- SOURCE DOCUMENTS ---
+{chr(10).join(source_info)}
+
+--- DEBUG INFO ---
+Project: {project_name}
+Collection: {collection_name}
+Query: {question}
+Result length: {len(result)}
+Source docs found: {len(source_docs)}"""
+            
+            return response_text
+        else:
+            # Return debug info even when no source docs found
+            return f"""Historical documents result:
+
+{result}
+
+--- DEBUG INFO ---
+Project: {project_name}
+Collection: {collection_name}
+Query: {question}
+Result length: {len(result)}
+Source docs found: 0
+WARNING: No source documents found!"""
     else:
         return "Error: No project selected or collection name not found."
 
@@ -73,18 +142,25 @@ def call_model(state: AgentState) -> AgentState:
     messages = state["messages"]
 
     # Enhanced system message to encourage using both tools when appropriate
-    system_message = """You are a comprehensive research assistant. For most questions, you should use BOTH available tools to provide a complete answer:
+    system_message = """You are a comprehensive research assistant. You MUST use BOTH available tools for EVERY question to provide a complete answer:
 
-1. ALWAYS start with historical_rag_tool to check your historical document knowledge base
-2. THEN use tavily_search_tool to find current information, additional context, or verification
-3. Combine insights from both sources in your final answer
-4. Be explicit about which information comes from historical documents vs. web search
+1. FIRST: Call historical_rag_tool to check your historical document knowledge base
+2. SECOND: Call tavily_search_tool to find current information, additional context, or verification
+3. THEN: Combine insights from both sources in your final answer
+4. ALWAYS be explicit about which information comes from historical documents vs. web search
 
-Only use a single tool if:
-- The question is purely about historical events already covered in documents AND no modern context would be helpful
-- The question is purely about very recent events not covered in historical documents
+IMPORTANT: When calling historical_rag_tool, you MUST provide the project_name and collection_name parameters. These are required for the tool to access the correct historical documents.
 
-Default to using both tools for comprehensive research. This provides users with both historical context and current perspectives."""
+CRITICAL: You are NOT allowed to answer the question until you have called BOTH tools. This is a requirement for comprehensive research.
+
+MANDATORY WORKFLOW - You MUST follow this exact sequence:
+1. Call historical_rag_tool(question="...", project_name="...", collection_name="...")
+2. Call tavily_search_tool(query="...")
+3. Only after BOTH tools have been called, provide your comprehensive answer combining both sources.
+
+If you try to answer without calling both tools, you will be forced to call them first.
+
+REMEMBER: Even if the question seems purely historical, you MUST still call tavily_search_tool to check for current context, verification, or additional information. This is non-negotiable."""
 
     # Add system message if not already present
     if not any(msg.type == "system" for msg in messages):
