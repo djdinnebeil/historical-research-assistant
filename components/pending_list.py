@@ -7,12 +7,12 @@ COLUMNS = [
 ]
 
 def render_pending_list(con):
-    if st.sidebar.button("View Pending Documents"):
-        rows = list_documents_by_status(con, "pending")
-        if rows:
-            st.write("### Pending Documents")
-            for row in rows:
-                record = dict(zip(COLUMNS, row))
-                st.json(record)  # shows as expandable JSON-like dict
-        else:
-            st.info("No pending documents.")
+    # if st.sidebar.button("View Pending Documents"):
+    rows = list_documents_by_status(con, "pending")
+    if rows:
+        st.write("### Pending Documents")
+        for row in rows:
+            record = dict(zip(COLUMNS, row))
+            st.json(record)  # shows as expandable JSON-like dict
+    else:
+        st.info("No pending documents.")
