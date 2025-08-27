@@ -11,6 +11,7 @@ from text_parsers.newspaper_parser import parse_newspaper_article
 from text_parsers.report_parser import parse_report
 from text_parsers.web_article_parser import parse_web_article
 from text_parsers.unsorted_parser import parse_unsorted
+from text_parsers.misc_parser import parse_misc
 
 # Dispatch table
 DISPATCH = {
@@ -20,6 +21,7 @@ DISPATCH = {
     "reports": parse_report,
     "web_articles": parse_web_article,
     "unsorted": parse_unsorted,
+    "misc": parse_misc,
 }
 
 def parse_file(file_path: str) -> dict:
