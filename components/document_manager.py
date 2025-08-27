@@ -11,6 +11,11 @@ COLUMNS = [
     "date", "num_chunks", "content_hash", "status", "added_at"
 ]
 
+@st.dialog("File Modal Window")
+def file_modal_content(content, doc_key):
+    st.write(content)
+    st.session_state[f"show_modal_{doc_key}"] = False
+
 def debug_vector_metadata(client, collection_name):
     """Debug function to show vector metadata structure"""
     try:
@@ -34,6 +39,8 @@ def debug_vector_metadata(client, collection_name):
             st.warning("Collection does not exist")
     except Exception as e:
         st.error(f"Error debugging vector metadata: {str(e)}")
+
+
 
 def render_document_manager(proj_dir, con, collection_name):
     st.subheader("📚 Document Manager")
@@ -155,8 +162,9 @@ def render_document_manager(proj_dir, con, collection_name):
                 
                 with col2:
                     # Action buttons
-                    if st.button("👁️ View Details", key=f"view_{doc_key}"):
+                    if st.button("View Details", key=f"view_{doc_key}"):
                         st.session_state[f"show_details_{doc_key}"] = True
+                        st.session_state[f"show_modal_{doc_key}"] = True
                     
                     # TODO: Add back confirmation dialog for delete operations
                     if st.button("🗑️ Delete", key=f"delete_{doc_key}", type="secondary"):
@@ -275,6 +283,9 @@ def render_document_manager(proj_dir, con, collection_name):
                             with open(file_path, 'r', encoding='utf-8') as f:
                                 content = f.read()
                                 st.text_area("Content:", content, height=200, disabled=True)
+
+                                if st.session_state.get(f"show_modal_{doc_key}", False):
+                                    file_modal_content(content, doc_key)
                         else:
                             st.warning(f"File not found at: {file_path}")
                             st.info(f"Database path: {record['path']}")

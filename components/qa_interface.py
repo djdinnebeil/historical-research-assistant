@@ -34,8 +34,8 @@ def render_qa_interface(project_name: str, collection_name: str):
             max_tokens = st.slider("Maximum response length", min_value=100, max_value=2000, value=1000, step=100)
             st.info("Advanced mode will use both your historical documents and web search for comprehensive answers.")
     
-    # Submit button - simplified disabled condition using text_input
-    if st.button("Ask Question", type="primary", disabled=not question.strip()):
+    # Submit button - always enabled for better UX
+    if st.button("Ask Question", type="primary"):
         if question.strip():
             with st.spinner("Thinking..."):
                 try:
@@ -48,7 +48,8 @@ def render_qa_interface(project_name: str, collection_name: str):
                     citations = []
                     web_sources = []
                     tools_used = []
-                    
+                    file_paths = []
+
                     if mode == "Standard":
                         # Standard mode: Use only the retriever chain (vector store)
                         from retriever_chain import load_chain
@@ -70,8 +71,10 @@ def render_qa_interface(project_name: str, collection_name: str):
                                 # Check for citation in metadata
                                 if hasattr(doc, 'metadata') and doc.metadata:
                                     citation = doc.metadata.get('citation')
+                                    file_path = doc.metadata.get('file_path')
                                     if citation and citation not in citations:
                                         citations.append(citation)
+                                        file_paths.append(file_path)
                                 
                                 # Also check for citation in the document itself if metadata doesn't have it
                                 if not citations and hasattr(doc, 'page_content'):
@@ -262,6 +265,24 @@ This is a mandatory requirement - you cannot skip either tool."""
                                     st.markdown("**Historical Documents:**")
                                     for i, citation in enumerate(citations, 1):
                                         st.markdown(f"{i}. {citation}")
+                                        
+                                        # Add expander to show file contents
+                                        if i <= len(file_paths) and file_paths[i-1]:
+                                            try:
+                                                with open(file_paths[i-1], 'r', encoding='utf-8') as f:
+                                                    file_content = f.read()
+                                                
+                                                with st.expander(f"📄 View file contents: {file_paths[i-1].split('/')[-1]}"):
+                                                    # Custom CSS to improve text readability and cursor
+                                                    st.markdown(file_content)
+                                                  
+                                            except Exception as e:
+                                                with st.expander(f"📄 View file contents: {file_paths[i-1].split('/')[-1]}"):
+                                                    st.error(f"Error reading file: {str(e)}")
+                                        else:
+                                            with st.expander("📄 View file contents"):
+                                                st.info("File path not available for this citation.")
+
                         else:
                             st.info("ℹ️ No citation information available for the sources consulted.")
                         
@@ -284,6 +305,7 @@ This is a mandatory requirement - you cannot skip either tool."""
                     st.error(f"Error generating answer: {str(e)}")
                     st.exception(e)
     
+
     # Information about the system
     st.divider()
     st.info(f"""
