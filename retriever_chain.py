@@ -11,6 +11,9 @@ from langchain_cohere import CohereRerank
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
 from config import using_cohere
 from qdrant_client.models import Filter, FieldCondition, MatchAny, MatchValue, Range
+from qdrant_client.http import models as qdrant_models
+
+
 
 from local_qdrant import get_qdrant_client, ensure_collection
 
@@ -61,24 +64,15 @@ def load_chain(project_name: str, collection_name: str, source_types: list = Non
             )
         )
     
-    # Add year filter if specified
-    if year_range and len(year_range) == 2:
+    if year_range:
         start_year, end_year = year_range
-        if start_year is not None or end_year is not None:
-            year_filter = {}
-            if start_year is not None:
-                year_filter["gte"] = start_year
-            if end_year is not None:
-                year_filter["lte"] = end_year
-            
-            if year_filter:
-                filter_conditions.append(
-                    FieldCondition(
-                        key="metadata.date",
-                        match=Range(**year_filter)
-                    )
-                )
-    
+        print(start_year, end_year)
+        filter_conditions.append(
+            FieldCondition(
+                key="metadata.year",
+                range={"gte":start_year, "lte":end_year}
+            ))
+
     # Create retriever with or without filters
     if filter_conditions:
         qdrant_filter = Filter(must=filter_conditions)

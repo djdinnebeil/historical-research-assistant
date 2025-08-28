@@ -4,17 +4,35 @@ import config
 def render_qa_interface(project_name: str, collection_name: str):
     """Render the question-answering interface using the LangGraph agent."""
     
+    # Reset filters when project changes (optional - comment out if you want filters to persist across projects)
+    # if "current_project" not in st.session_state or st.session_state.current_project != project_name:
+    #     st.session_state.current_project = project_name
+    #     # Uncomment the lines below if you want to reset filters for each project
+    #     # st.session_state.year_filter_mode = "No Filter"
+    #     # st.session_state.source_types_filter = ["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"]
+    #     # st.session_state.search_mode = "Standard"
+    
     st.header("🤖 Ask Questions")
     st.markdown("Ask questions about your historical documents and get AI-powered answers that combine historical context with current information.")
     
     # Mode selection toggle
     st.subheader("🔧 Select Mode")
+    
+    # Initialize session state for mode if not exists
+    if "search_mode" not in st.session_state:
+        st.session_state.search_mode = "Standard"
+    
     mode = st.radio(
         "Choose your search mode:",
         options=["Standard", "Advanced"],
         help="Standard: Uses only your uploaded historical documents. Advanced: Combines historical documents with web search for current context.",
-        index=0  # Default to Standard
+        index=["Standard", "Advanced"].index(st.session_state.search_mode),
+        key="search_mode_radio"
     )
+    
+    # Update session state when mode changes
+    if mode != st.session_state.search_mode:
+        st.session_state.search_mode = mode
     
     st.divider()
     
@@ -22,39 +40,113 @@ def render_qa_interface(project_name: str, collection_name: str):
     st.subheader("🔍 Filter Sources")
     
     # Source type filter
+    # Initialize session state for source type filter if not exists
+    if "source_types_filter" not in st.session_state:
+        st.session_state.source_types_filter = ["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"]
+    
     source_types = st.multiselect(
         "Select source types to include:",
         options=["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"],
-        default=["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"],
+        default=st.session_state.source_types_filter,
         help="Select one or more source types to filter your search. Leave all selected to search all sources.",
         key="source_type_filter"
     )
     
-    # Year range filter
-    col1, col2 = st.columns(2)
-    with col1:
-        start_year = st.number_input(
-            "Start Year:",
-            min_value=1000,
-            max_value=2024,
-            value=1000,
-            help="Earliest year to include in search (leave at 1000 for no lower limit)"
-        )
+    # Update session state when source types change
+    if source_types != st.session_state.source_types_filter:
+        st.session_state.source_types_filter = source_types
     
-    with col2:
-        end_year = st.number_input(
-            "End Year:",
+    # Year range filter
+    st.subheader("📅 Year Filter")
+    
+    # Initialize session state for year filter settings if not exists
+    if "year_filter_mode" not in st.session_state:
+        st.session_state.year_filter_mode = "No Filter"
+    if "selected_year" not in st.session_state:
+        st.session_state.selected_year = 1800
+    if "start_year" not in st.session_state:
+        st.session_state.start_year = 1500
+    if "end_year" not in st.session_state:
+        st.session_state.end_year = 2025
+    
+    # Year filter mode selection
+    year_filter_mode = st.radio(
+        "Choose year filter mode:",
+        options=["No Filter", "Single Year", "Year Range"],
+        help="No Filter: Include all years | Single Year: Focus on one specific year | Year Range: Specify a range of years",
+        index=["No Filter", "Single Year", "Year Range"].index(st.session_state.year_filter_mode),
+        key="year_filter_mode_radio"
+    )
+    
+    # Update session state when mode changes
+    if year_filter_mode != st.session_state.year_filter_mode:
+        st.session_state.year_filter_mode = year_filter_mode
+        st.rerun()
+    
+    # Year inputs based on selected mode
+    if year_filter_mode == "Single Year":
+        selected_year = st.number_input(
+            "Select Year:",
             min_value=1000,
-            max_value=2024,
-            value=2024,
-            help="Latest year to include in search (leave at 2024 for no upper limit)"
+            max_value=2025,
+            value=st.session_state.selected_year,
+            help="Specific year to focus on",
+            key="selected_year_input"
         )
+        # Update session state
+        if selected_year != st.session_state.selected_year:
+            st.session_state.selected_year = selected_year
+        
+        start_year = selected_year
+        end_year = selected_year
+    elif year_filter_mode == "Year Range":
+        col1, col2 = st.columns(2)
+        with col1:
+            start_year = st.number_input(
+                "Start Year:",
+                min_value=1000,
+                max_value=2025,
+                value=st.session_state.start_year,
+                help="Earliest year to include in search",
+                key="start_year_input"
+            )
+            # Update session state
+            if start_year != st.session_state.start_year:
+                st.session_state.start_year = start_year
+        
+        with col2:
+            end_year = st.number_input(
+                "End Year:",
+                min_value=1000,
+                max_value=2025,
+                value=st.session_state.end_year,
+                help="Latest year to include in search",
+                key="end_year_input"
+            )
+            # Update session state
+            if end_year != st.session_state.end_year:
+                st.session_state.end_year = end_year
+    else:  # No Filter
+        start_year = 1000
+        end_year = 2025
     
     # Filter summary
+    filter_info = []
     if source_types and len(source_types) < 7:
-        st.info(f"🔍 **Active Filters:** Source types: {', '.join(source_types)} | Year range: {start_year}-{end_year}")
-    elif start_year > 1000 or end_year < 2024:
-        st.info(f"🔍 **Active Filters:** Year range: {start_year}-{end_year}")
+        filter_info.append(f"Source types: {', '.join(source_types)}")
+    
+    if year_filter_mode == "Single Year":
+        filter_info.append(f"Year: {start_year}")
+    elif year_filter_mode == "Year Range":
+        filter_info.append(f"Year range: {start_year}-{end_year}")
+    
+    if filter_info:
+        st.info(f"🔍 **Active Filters:** {' | '.join(filter_info)}")
+        # Add reset button for convenience
+        if st.button("🔄 Reset All Filters", type="secondary", key="reset_filters_btn"):
+            st.session_state.year_filter_mode = "No Filter"
+            st.session_state.source_types_filter = ["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"]
+            st.rerun()
     else:
         st.info("🔍 **No active filters** - searching all sources and years")
     
@@ -97,11 +189,17 @@ def render_qa_interface(project_name: str, collection_name: str):
                         from retriever_chain import load_chain
                         
                         # Load the chain for the current project with filters
+                        year_range = None
+                        if year_filter_mode == "Single Year":
+                            year_range = (start_year, start_year)
+                        elif year_filter_mode == "Year Range":
+                            year_range = (start_year, end_year)
+                        
                         qa_chain, naive_retriever = load_chain(
                             project_name, 
                             collection_name, 
                             source_types=source_types if source_types else None,
-                            year_range=(start_year, end_year) if start_year > 1000 or end_year < 2024 else None
+                            year_range=year_range
                         )
                         
                         # Use the retriever chain directly (vector store only)
@@ -151,14 +249,20 @@ def render_qa_interface(project_name: str, collection_name: str):
                         filter_info = ""
                         if source_types and len(source_types) < 7:
                             filter_info += f"\nSource type filter: {', '.join(source_types)}"
-                        if start_year > 1000 or end_year < 2024:
+                        
+                        if year_filter_mode == "Single Year":
+                            filter_info += f"\nYear filter: {start_year}"
+                        elif year_filter_mode == "Year Range":
                             filter_info += f"\nYear range filter: {start_year}-{end_year}"
                         
                         # Prepare filter parameters for the tool call
                         filter_params = ""
                         if source_types and len(source_types) < 7:
                             filter_params += f', source_types={source_types}'
-                        if start_year > 1000 or end_year < 2024:
+                        
+                        if year_filter_mode == "Single Year":
+                            filter_params += f', year_range=({start_year}, {start_year})'
+                        elif year_filter_mode == "Year Range":
                             filter_params += f', year_range=({start_year}, {end_year})'
                         
                         project_context = f"""Current project: {project_name}
@@ -298,11 +402,13 @@ This is a mandatory requirement - you cannot skip either tool."""
                         st.markdown(f"**Mode:** {mode}")
                         
                         # Display active filters used
-                        if source_types and len(source_types) < 7 or start_year > 1000 or end_year < 2024:
+                        if source_types and len(source_types) < 7 or year_filter_mode != "No Filter":
                             st.markdown("**🔍 Filters Applied:**")
                             if source_types and len(source_types) < 7:
                                 st.markdown(f"- **Source Types:** {', '.join(source_types)}")
-                            if start_year > 1000 or end_year < 2024:
+                            if year_filter_mode == "Single Year":
+                                st.markdown(f"- **Year:** {start_year}")
+                            elif year_filter_mode == "Year Range":
                                 st.markdown(f"- **Year Range:** {start_year}-{end_year}")
                         
                         # Display sources consulted
@@ -383,7 +489,7 @@ This is a mandatory requirement - you cannot skip either tool."""
     
     **Advanced Mode:** Combines your historical documents with web search to provide comprehensive answers that include both historical context and current information.
     
-    **Filtering:** You can filter by source type (book, journal, newspaper, etc.) and year range to focus your search on specific types of documents or time periods.
+    **Filtering:** You can filter by source type (book, journal, newspaper, etc.) and year (single year, year range, or no filter) to focus your search on specific types of documents or time periods.
     
     Current mode: **{mode}**
     

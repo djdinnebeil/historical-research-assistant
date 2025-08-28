@@ -83,6 +83,13 @@ def parse_newspaper_article(file_path: str) -> dict:
     chunk_parts.append(body)
     page_content = "\n".join([p for p in chunk_parts if p.strip()])
 
+    # Checking the year
+    try:
+        year = int(date_str[:4])
+    except ValueError:
+        year = None
+
+
     # --- Step 8: Return structured output ---
     return {
         "page_content": page_content,
@@ -91,6 +98,7 @@ def parse_newspaper_article(file_path: str) -> dict:
             "source_id": source_id,   # consistent with books/journals
             "source_name": newspaper, # human-readable form
             "date": date_str,
+            "year": year,
             "page": page,
             "title": title,
             "subtitles": subtitles,
