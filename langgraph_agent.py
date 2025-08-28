@@ -14,8 +14,8 @@ import config
 
 # ✅ Cache the chain so it reuses the same Qdrant client
 @st.cache_resource
-def get_chains(project_name: str, collection_name: str):
-    return load_chain(project_name, collection_name)
+def get_chains(project_name: str, collection_name: str, source_types: list = None, year_range: tuple = None):
+    return load_chain(project_name, collection_name, source_types, year_range)
 
 # Remove the global chain initialization since it will be called from the component
 # qa_chain, naive_retriever = get_chains(
@@ -43,10 +43,19 @@ def tavily_search_tool(query: str) -> str:
         return "No web search results found."
 
 @tool
-def historical_rag_tool(question: str, project_name: str = None, collection_name: str = None) -> str:
+def historical_rag_tool(question: str, project_name: str = None, collection_name: str = None, 
+                        source_types: list = None, year_range: tuple = None) -> str:
     """Search and retrieve information from uploaded historical documents. 
     Use this tool first for any question to check what historical information is available, 
-    then consider using web search to supplement with current information."""
+    then consider using web search to supplement with current information.
+    
+    Args:
+        question: The question to search for
+        project_name: Name of the project to search in
+        collection_name: Name of the collection to search in
+        source_types: Optional list of source types to filter by (e.g., ['book', 'journal'])
+        year_range: Optional tuple of (start_year, end_year) for filtering
+    """
     
     # Try to get project and collection from parameters first, then fall back to session state
     if project_name is None or collection_name is None:
@@ -63,8 +72,10 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
     
     if project_name and collection_name:
         print(f"🔍 **Tool Debug:** Querying project: {project_name}, collection: {collection_name}")
+        print(f"🔍 **Tool Debug:** Source types filter: {source_types}")
+        print(f"🔍 **Tool Debug:** Year range filter: {year_range}")
         
-        qa_chain, naive_retriever = get_chains(project_name, collection_name)
+        qa_chain, naive_retriever = get_chains(project_name, collection_name, source_types, year_range)
         response = qa_chain.invoke(question)
         
         # Extract result and source documents
@@ -82,8 +93,13 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
             source_info = []
             for i, doc in enumerate(source_docs, 1):
                 citation = "Unknown source"
+                source_type = "Unknown"
+                date = "Unknown"
+                
                 if hasattr(doc, 'metadata') and doc.metadata:
                     citation = doc.metadata.get('citation', 'Unknown source')
+                    source_type = doc.metadata.get('source_type', 'Unknown')
+                    date = doc.metadata.get('date', 'Unknown')
                 elif hasattr(doc, 'page_content'):
                     content = doc.page_content
                     if 'citation:' in content.lower() or 'source:' in content.lower():
@@ -93,15 +109,23 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
                                 citation = line.split(':', 1)[1].strip()
                                 break
                 
-                source_info.append(f"Source {i}: {citation}")
+                source_info.append(f"Source {i}: {citation} [{source_type}, {date}]")
             
             # Return structured response with source information AND debug info
+            filter_info = ""
+            if source_types:
+                filter_info += f"\nSource types filter: {source_types}"
+            if year_range:
+                filter_info += f"\nYear range filter: {year_range}"
+            
             response_text = f"""Historical documents result:
 
 {result}
 
 --- SOURCE DOCUMENTS ---
 {chr(10).join(source_info)}
+
+--- FILTERS APPLIED ---{filter_info}
 
 --- DEBUG INFO ---
 Project: {project_name}
@@ -113,9 +137,17 @@ Source docs found: {len(source_docs)}"""
             return response_text
         else:
             # Return debug info even when no source docs found
+            filter_info = ""
+            if source_types:
+                filter_info += f"\nSource types filter: {source_types}"
+            if year_range:
+                filter_info += f"\nYear range filter: {year_range}"
+            
             return f"""Historical documents result:
 
 {result}
+
+--- FILTERS APPLIED ---{filter_info}
 
 --- DEBUG INFO ---
 Project: {project_name}
@@ -150,6 +182,10 @@ def call_model(state: AgentState) -> AgentState:
 4. ALWAYS be explicit about which information comes from historical documents vs. web search
 
 IMPORTANT: When calling historical_rag_tool, you MUST provide the project_name and collection_name parameters. These are required for the tool to access the correct historical documents.
+
+FILTERING CAPABILITIES: The historical_rag_tool now supports source type and year filtering:
+- source_types: List of source types to include (e.g., ['book', 'journal', 'newspaper', 'report', 'web_article', 'misc', 'unsorted'])
+- year_range: Tuple of (start_year, end_year) for filtering by date
 
 CRITICAL: You are NOT allowed to answer the question until you have called BOTH tools. This is a requirement for comprehensive research.
 

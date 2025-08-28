@@ -18,6 +18,48 @@ def render_qa_interface(project_name: str, collection_name: str):
     
     st.divider()
     
+    # Filter section
+    st.subheader("🔍 Filter Sources")
+    
+    # Source type filter
+    source_types = st.multiselect(
+        "Select source types to include:",
+        options=["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"],
+        default=["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"],
+        help="Select one or more source types to filter your search. Leave all selected to search all sources.",
+        key="source_type_filter"
+    )
+    
+    # Year range filter
+    col1, col2 = st.columns(2)
+    with col1:
+        start_year = st.number_input(
+            "Start Year:",
+            min_value=1000,
+            max_value=2024,
+            value=1000,
+            help="Earliest year to include in search (leave at 1000 for no lower limit)"
+        )
+    
+    with col2:
+        end_year = st.number_input(
+            "End Year:",
+            min_value=1000,
+            max_value=2024,
+            value=2024,
+            help="Latest year to include in search (leave at 2024 for no upper limit)"
+        )
+    
+    # Filter summary
+    if source_types and len(source_types) < 7:
+        st.info(f"🔍 **Active Filters:** Source types: {', '.join(source_types)} | Year range: {start_year}-{end_year}")
+    elif start_year > 1000 or end_year < 2024:
+        st.info(f"🔍 **Active Filters:** Year range: {start_year}-{end_year}")
+    else:
+        st.info("🔍 **No active filters** - searching all sources and years")
+    
+    st.divider()
+    
     # Question input section
     st.subheader("Ask a New Question")
     
@@ -54,8 +96,13 @@ def render_qa_interface(project_name: str, collection_name: str):
                         # Standard mode: Use only the retriever chain (vector store)
                         from retriever_chain import load_chain
                         
-                        # Load the chain for the current project
-                        qa_chain, naive_retriever = load_chain(project_name, collection_name)
+                        # Load the chain for the current project with filters
+                        qa_chain, naive_retriever = load_chain(
+                            project_name, 
+                            collection_name, 
+                            source_types=source_types if source_types else None,
+                            year_range=(start_year, end_year) if start_year > 1000 or end_year < 2024 else None
+                        )
                         
                         # Use the retriever chain directly (vector store only)
                         response = qa_chain.invoke(question)
@@ -99,14 +146,27 @@ def render_qa_interface(project_name: str, collection_name: str):
                         # Build the agent graph (already compiled)
                         agent_graph = build_agent_graph()
                         
-                        # Create a system message with project context
+                        # Create a system message with project context and filters
                         from langchain_core.messages import SystemMessage
+                        filter_info = ""
+                        if source_types and len(source_types) < 7:
+                            filter_info += f"\nSource type filter: {', '.join(source_types)}"
+                        if start_year > 1000 or end_year < 2024:
+                            filter_info += f"\nYear range filter: {start_year}-{end_year}"
+                        
+                        # Prepare filter parameters for the tool call
+                        filter_params = ""
+                        if source_types and len(source_types) < 7:
+                            filter_params += f', source_types={source_types}'
+                        if start_year > 1000 or end_year < 2024:
+                            filter_params += f', year_range=({start_year}, {end_year})'
+                        
                         project_context = f"""Current project: {project_name}
-Current collection: {collection_name}
+Current collection: {collection_name}{filter_info}
 
 WORKFLOW REQUIREMENTS:
 1. You MUST call historical_rag_tool FIRST with these exact parameters:
-   historical_rag_tool(question="{question}", project_name="{project_name}", collection_name="{collection_name}")
+   historical_rag_tool(question="{question}", project_name="{project_name}", collection_name="{collection_name}"{filter_params})
 
 2. You MUST call tavily_search_tool SECOND with a relevant query about the topic.
 
@@ -237,6 +297,14 @@ This is a mandatory requirement - you cannot skip either tool."""
                         # Display mode used
                         st.markdown(f"**Mode:** {mode}")
                         
+                        # Display active filters used
+                        if source_types and len(source_types) < 7 or start_year > 1000 or end_year < 2024:
+                            st.markdown("**🔍 Filters Applied:**")
+                            if source_types and len(source_types) < 7:
+                                st.markdown(f"- **Source Types:** {', '.join(source_types)}")
+                            if start_year > 1000 or end_year < 2024:
+                                st.markdown(f"- **Year Range:** {start_year}-{end_year}")
+                        
                         # Display sources consulted
                         if citations or web_sources:
                             st.markdown("**📚 Sources Consulted:**")
@@ -314,6 +382,8 @@ This is a mandatory requirement - you cannot skip either tool."""
     **Standard Mode:** Uses only your uploaded historical documents through the vector store for focused, document-based answers.
     
     **Advanced Mode:** Combines your historical documents with web search to provide comprehensive answers that include both historical context and current information.
+    
+    **Filtering:** You can filter by source type (book, journal, newspaper, etc.) and year range to focus your search on specific types of documents or time periods.
     
     Current mode: **{mode}**
     
