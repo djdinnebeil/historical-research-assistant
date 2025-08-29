@@ -137,13 +137,15 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
         
         with col2:
             if st.button("🗑️ Delete Collection", type="secondary"):
-                if st.checkbox("I understand this will permanently delete all vectors"):
-                    try:
-                        client.delete_collection(collection_name)
-                        st.success(f"Collection '{collection_name}' deleted successfully!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Failed to delete collection: {str(e)}")
+                # TODO: Implement this
+                print('This is not implemented yet.')
+                # if st.checkbox("I understand this will permanently delete all vectors"):
+                    # try:
+                    #     client.delete_collection(collection_name)
+                    #     st.success(f"Collection '{collection_name}' deleted successfully!")
+                    #     st.rerun()
+                    # except Exception as e:
+                    #     st.error(f"Failed to delete collection: {str(e)}")
         
         with col3:
             if st.button("🧹 Clear Cache"):

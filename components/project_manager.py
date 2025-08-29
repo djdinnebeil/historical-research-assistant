@@ -93,11 +93,11 @@ def render_project_manager(proj_dir: Path, db_client, collection_name: str):
         st.metric("Collection Name", collection_name)
     
     with col2:
-        # Count documents
+        # Count .txt documents (including nested folders)
         docs_dir = proj_dir / "documents"
-        doc_count = len(list(docs_dir.glob("*"))) if docs_dir.exists() else 0
+        doc_count = len(list(docs_dir.rglob("*.txt"))) if docs_dir.exists() else 0
         st.metric("Documents", doc_count)
-        
+
         # Check Qdrant status
         qdrant_dir = proj_dir / "qdrant"
         qdrant_exists = qdrant_dir.exists()
