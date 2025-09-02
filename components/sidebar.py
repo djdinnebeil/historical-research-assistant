@@ -113,7 +113,7 @@ def render_sidebar():
     print(f"🔧 Sidebar: Setting up navigation for project: {selected}")
     
     # Define navigation options
-    nav_options = ["Uploader", "Pending Documents", "Process Pending", "Document Sync", "Vector Store", "Document Manager", "Ask Questions", "Chat History", "Project Management"]
+    nav_options = ["Uploader", "Process Pending", "Document Sync", "Vector Store", "Document Manager", "Ask Questions", "Chat History", "Project Management"]
     
     # Safely get the current navigation choice index
     current_nav = st.session_state.get("current_nav_choice", "Uploader")

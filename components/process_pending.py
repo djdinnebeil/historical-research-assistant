@@ -7,15 +7,16 @@ from langchain_community.vectorstores import Qdrant
 from langchain.schema import Document
 from pathlib import Path
 from embedder import embed_documents
+from components.pending_list import render_pending_list
 
 def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.subheader("⚙️ Process Pending Documents")
 
     # Debug information
-    st.subheader("🔍 Debug Information")
-    st.write(f"Project directory: {proj_dir}")
-    st.write(f"Database connection: {con}")
-    st.write(f"Database path: {getattr(con, 'path', 'Unknown')}")
+    print("🔍 Debug Information")
+    print(f"Project directory: {proj_dir}")
+    print(f"Database connection: {con}")
+    print(f"Database path: {getattr(con, 'path', 'Unknown')}")
     
     # Check if the database file actually exists
     if hasattr(con, 'path'):
@@ -26,8 +27,8 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     # Check project database path
     project_name = Path(proj_dir).name
     expected_db_path = proj_dir / f"{project_name}.sqlite"
-    st.write(f"Expected DB path: {expected_db_path}")
-    st.write(f"Expected DB exists: {expected_db_path.exists()}")
+    print(f"Expected DB path: {expected_db_path}")
+    print(f"Expected DB exists: {expected_db_path.exists()}")
     
     rows = list_documents_by_status(con, "pending")
     if not rows:
@@ -36,6 +37,8 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
 
     st.write(f"Found {len(rows)} pending document(s).")
     
+    render_pending_list(con)
+
     # Show initial database state
     st.subheader("📊 Initial Database State")
     initial_pending = list_documents_by_status(con, "pending")
@@ -43,88 +46,89 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.write(f"Pending documents: {len(initial_pending)}")
     st.write(f"Embedded documents: {len(initial_embedded)}")
     
+    
     # Add a test button to verify database updates work
-    if st.button("🧪 Test Database Update"):
-        if initial_pending:
-            test_row = initial_pending[0]
-            test_hash = test_row[7]  # content_hash is at index 7
-            test_path = test_row[1]  # path is at index 1
+    # if st.button("🧪 Test Database Update"):
+    #     if initial_pending:
+    #         test_row = initial_pending[0]
+    #         test_hash = test_row[7]  # content_hash is at index 7
+    #         test_path = test_row[1]  # path is at index 1
             
-            st.info(f"Testing update on: {test_path}")
-            st.info(f"Content hash: {test_hash}")
+    #         st.info(f"Testing update on: {test_path}")
+    #         st.info(f"Content hash: {test_hash}")
             
-            # Try to update just this one document
-            try:
-                # First, check current status
-                current_status = con.execute("SELECT status, num_chunks FROM documents WHERE content_hash = ?", (test_hash,)).fetchone()
-                st.write(f"Current status: {current_status}")
+    #         # Try to update just this one document
+    #         try:
+    #             # First, check current status
+    #             current_status = con.execute("SELECT status, num_chunks FROM documents WHERE content_hash = ?", (test_hash,)).fetchone()
+    #             st.write(f"Current status: {current_status}")
                 
-                # Try manual update
-                st.write("Attempting manual database update...")
-                con.execute("UPDATE documents SET status = 'test_status', num_chunks = 999 WHERE content_hash = ?", (test_hash,))
-                con.commit()
-                st.write("Manual update executed and committed")
+    #             # Try manual update
+    #             st.write("Attempting manual database update...")
+    #             con.execute("UPDATE documents SET status = 'test_status', num_chunks = 999 WHERE content_hash = ?", (test_hash,))
+    #             con.commit()
+    #             st.write("Manual update executed and committed")
                 
-                # Check if it worked
-                updated_docs = list_documents_by_status(con, "test_status")
-                if updated_docs:
-                    st.success(f"✅ Test update successful! Document now has status: test_status")
+    #             # Check if it worked
+    #             updated_docs = list_documents_by_status(con, "test_status")
+    #             if updated_docs:
+    #                 st.success(f"✅ Test update successful! Document now has status: test_status")
                     
-                    # Revert the test change
-                    update_document_status(con, test_hash, 0, "pending")
-                    con.commit()
-                    st.info("🔄 Test change reverted")
-                else:
-                    st.error("❌ Test update failed - document not found with test_status")
-            except Exception as e:
-                st.error(f"❌ Test update error: {e}")
-                import traceback
-                st.error(f"Full error: {traceback.format_exc()}")
-        else:
-            st.warning("No pending documents to test with")
+    #                 # Revert the test change
+    #                 update_document_status(con, test_hash, 0, "pending")
+    #                 con.commit()
+    #                 st.info("🔄 Test change reverted")
+    #             else:
+    #                 st.error("❌ Test update failed - document not found with test_status")
+    #         except Exception as e:
+    #             st.error(f"❌ Test update error: {e}")
+    #             import traceback
+    #             st.error(f"Full error: {traceback.format_exc()}")
+    #     else:
+    #         st.warning("No pending documents to test with")
     
-    # Add a button to manually check database state
-    if st.button("🔍 Check Database State"):
-        st.subheader("Raw Database Queries")
+    # # Add a button to manually check database state
+    # if st.button("🔍 Check Database State"):
+    #     st.subheader("Raw Database Queries")
         
-        # Check pending documents
-        pending_query = con.execute("SELECT COUNT(*) FROM documents WHERE status = 'pending'").fetchone()
-        st.write(f"Pending count (raw SQL): {pending_query[0]}")
+    #     # Check pending documents
+    #     pending_query = con.execute("SELECT COUNT(*) FROM documents WHERE status = 'pending'").fetchone()
+    #     st.write(f"Pending count (raw SQL): {pending_query[0]}")
         
-        # Check embedded documents
-        embedded_query = con.execute("SELECT COUNT(*) FROM documents WHERE status = 'embedded'").fetchone()
-        st.write(f"Embedded count (raw SQL): {embedded_query[0]}")
+    #     # Check embedded documents
+    #     embedded_query = con.execute("SELECT COUNT(*) FROM documents WHERE status = 'embedded'").fetchone()
+    #     st.write(f"Embedded count (raw SQL): {embedded_query[0]}")
         
-        # Show all documents with their status
-        all_docs = con.execute("SELECT path, status, num_chunks FROM documents ORDER BY status").fetchall()
-        st.write("All documents:")
-        for doc in all_docs:
-            st.write(f"- {doc[0]}: status={doc[1]}, chunks={doc[2]}")
+    #     # Show all documents with their status
+    #     all_docs = con.execute("SELECT path, status, num_chunks FROM documents ORDER BY status").fetchall()
+    #     st.write("All documents:")
+    #     for doc in all_docs:
+    #         st.write(f"- {doc[0]}: status={doc[1]}, chunks={doc[2]}")
     
-    # Add a button to show raw row structure
-    if st.button("📋 Show Raw Row Structure"):
-        if initial_pending:
-            st.subheader("Raw Row Structure for First Pending Document")
-            test_row = initial_pending[0]
-            st.write(f"Row length: {len(test_row)}")
-            st.write("Row contents:")
-            for i, value in enumerate(test_row):
-                st.write(f"  [{i}]: {value}")
+    # # Add a button to show raw row structure
+    # if st.button("📋 Show Raw Row Structure"):
+    #     if initial_pending:
+    #         st.subheader("Raw Row Structure for First Pending Document")
+    #         test_row = initial_pending[0]
+    #         st.write(f"Row length: {len(test_row)}")
+    #         st.write("Row contents:")
+    #         for i, value in enumerate(test_row):
+    #             st.write(f"  [{i}]: {value}")
             
-            # Show the expected mapping
-            st.write("\nExpected mapping:")
-            st.write(f"  [0]: id = {test_row[0]}")
-            st.write(f"  [1]: path = {test_row[1]}")
-            st.write(f"  [2]: citation = {test_row[2]}")
-            st.write(f"  [3]: source_type = {test_row[3]}")
-            st.write(f"  [4]: source_id = {test_row[4]}")
-            st.write(f"  [5]: date = {test_row[5]}")
-            st.write(f"  [6]: num_chunks = {test_row[6]}")
-            st.write(f"  [7]: content_hash = {test_row[7]}")
-            st.write(f"  [8]: status = {test_row[8]}")
-            st.write(f"  [9]: added_at = {test_row[9]}")
-        else:
-            st.warning("No pending documents to examine")
+    #         # Show the expected mapping
+    #         st.write("\nExpected mapping:")
+    #         st.write(f"  [0]: id = {test_row[0]}")
+    #         st.write(f"  [1]: path = {test_row[1]}")
+    #         st.write(f"  [2]: citation = {test_row[2]}")
+    #         st.write(f"  [3]: source_type = {test_row[3]}")
+    #         st.write(f"  [4]: source_id = {test_row[4]}")
+    #         st.write(f"  [5]: date = {test_row[5]}")
+    #         st.write(f"  [6]: num_chunks = {test_row[6]}")
+    #         st.write(f"  [7]: content_hash = {test_row[7]}")
+    #         st.write(f"  [8]: status = {test_row[8]}")
+    #         st.write(f"  [9]: added_at = {test_row[9]}")
+    #     else:
+    #         st.warning("No pending documents to examine")
     
     # Add a progress bar
     progress_bar = st.progress(0)

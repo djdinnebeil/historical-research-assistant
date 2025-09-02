@@ -31,7 +31,7 @@ if "selected_project" in st.session_state and st.session_state["selected_project
     
     # Show project change counter for debugging
     if "project_change_counter" in st.session_state:
-        st.caption(f"Project changes: {st.session_state['project_change_counter']}")
+        print(f"Project changes: {st.session_state['project_change_counter']}")
 
 # Ensure the session state is properly set for the selected project
 if selected != "-- New Project --":
@@ -44,53 +44,53 @@ if "last_selected_project" not in st.session_state:
     st.session_state["project_change_counter"] = 0
 elif st.session_state["last_selected_project"] != selected:
     # Project has changed - perform cleanup
-    st.sidebar.write(f"🔄 Project change detected: {st.session_state['last_selected_project']} → {selected}")
-    st.sidebar.info(f"🔄 Project changed from {st.session_state['last_selected_project']} to {selected}")
+    print(f"🔄 Project change detected: {st.session_state['last_selected_project']} → {selected}")
+    print(f"🔄 Project changed from {st.session_state['last_selected_project']} to {selected}")
     
     # Clear old project data
     if "db_client" in st.session_state:
-        st.sidebar.write("🗑️ Clearing old db_client")
+        print("🗑️ Clearing old db_client")
         del st.session_state["db_client"]
     
     # Clear Qdrant cache
-    st.sidebar.write("🗑️ Clearing Qdrant cache")
+    print("🗑️ Clearing Qdrant cache")
     from local_qdrant import force_clear_all_qdrant_caches
     force_clear_all_qdrant_caches()
     
     # Update tracking
     st.session_state["last_selected_project"] = selected
     st.session_state["project_change_counter"] = st.session_state.get("project_change_counter", 0) + 1
-    st.sidebar.write(f"🔄 Updated last_selected_project={st.session_state['last_selected_project']}, counter={st.session_state['project_change_counter']}")
+    print(f"🔄 Updated last_selected_project={st.session_state['last_selected_project']}, counter={st.session_state['project_change_counter']}")
     
     # Force a rerun to ensure clean state
     st.rerun()
 else:
-    st.sidebar.write(f"✅ Same project, no change needed: {selected}")
+    print(f"✅ Same project, no change needed: {selected}")
 
 # Navigation change detection
 if "last_nav_choice" not in st.session_state:
     st.session_state["last_nav_choice"] = nav_choice
 elif st.session_state["last_nav_choice"] != nav_choice:
     # Navigation has changed
-    st.sidebar.write(f"🔄 Navigation changed: {st.session_state['last_nav_choice']} → {nav_choice}")
+    print(f"🔄 Navigation changed: {st.session_state['last_nav_choice']} → {nav_choice}")
     st.session_state["last_nav_choice"] = nav_choice
     
     # Force a rerun to ensure the new navigation section loads immediately
     st.rerun()
 
 # Additional debugging
-st.sidebar.write(f"Debug: selected={selected}, last_selected_project={st.session_state.get('last_selected_project', 'None')}, db_client={db_client is not None}")
+print(f"Debug: selected={selected}, last_selected_project={st.session_state.get('last_selected_project', 'None')}, db_client={db_client is not None}")
 
 # More detailed debugging
 if selected != "-- New Project --" and proj_dir is not None:
-    st.sidebar.write(f"Project details: {selected}")
-    st.sidebar.write(f"Directory exists: {proj_dir.exists()}")
-    st.sidebar.write(f"Navigation choice: {nav_choice}")
-    st.sidebar.write(f"DB client type: {type(db_client)}")
+    print(f"Directory exists: {proj_dir.exists()}")
+    print(f"Project details: {selected}")
+    print(f"Navigation choice: {nav_choice}")
+    print(f"DB client type: {type(db_client)}")
 elif selected == "-- New Project --":
-    st.sidebar.write("No project selected - new project creation mode")
+    print("No project selected - new project creation mode")
 else:
-    st.sidebar.write(f"Project selected but proj_dir is None: {selected}")
+    print(f"Project selected but proj_dir is None: {selected}")
 
 # Ensure we have a valid project selected
 if selected == "-- New Project --":
