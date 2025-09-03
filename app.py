@@ -18,6 +18,10 @@ if "qdrant_initialized" not in st.session_state:
 
 st.title("📜 Historical Research Assistant")
 
+if 'initialized' not in st.session_state:
+    st.session_state["initialized"] = True
+    st.write("To use this application, please select a project or create a new one.")
+
 selected, proj_dir, db_client, nav_choice = render_sidebar()
 
 # Debug info - show current project and collection name (AFTER sidebar processing)
@@ -103,7 +107,7 @@ if db_client:
     st.session_state.db_client = db_client
     collection_name = st.session_state.get("collection_name", f"{selected}_docs")
 
-    if nav_choice == "Uploader":
+    if nav_choice == "Upload Documents":
         render_uploader(proj_dir, con)
     elif nav_choice == "Pending Documents":
         render_pending_list(con)

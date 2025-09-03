@@ -82,13 +82,25 @@ def load_chain(project_name: str, collection_name: str, source_types: list = Non
     else:
         naive_retriever = vectorstore.as_retriever(search_kwargs={"k": 15})
 
+    # Apply contextual compression if using_cohere is True
+    if using_cohere:
+        compressor = CohereRerank(model="rerank-v3.5")
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=naive_retriever, top_k=12
+        )
+        final_retriever = compression_retriever
+    else:
+        final_retriever = naive_retriever
+
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=naive_retriever,
+        retriever=final_retriever,
         chain_type_kwargs={"prompt": prompt},
         return_source_documents=True
     )
-
-    return qa_chain, naive_retriever    
+    if using_cohere:
+        return qa_chain, naive_retriever, compression_retriever
+    else:
+        return qa_chain, naive_retriever

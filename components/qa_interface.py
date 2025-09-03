@@ -1,5 +1,5 @@
 import streamlit as st
-import config
+from config import using_cohere
 
 def render_qa_interface(project_name: str, collection_name: str):
     """Render the question-answering interface using the LangGraph agent."""
@@ -195,13 +195,21 @@ def render_qa_interface(project_name: str, collection_name: str):
                         elif year_filter_mode == "Year Range":
                             year_range = (start_year, end_year)
                         
-                        qa_chain, naive_retriever = load_chain(
-                            project_name, 
-                            collection_name, 
-                            source_types=source_types if source_types else None,
-                            year_range=year_range
-                        )
-                        
+                        if using_cohere:
+                            qa_chain, naive_retriever, compression_retriever = load_chain(
+                                project_name, 
+                                collection_name, 
+                                source_types=source_types if source_types else None,
+                                year_range=year_range
+                            )
+                        else:
+                            qa_chain, naive_retriever = load_chain(
+                                project_name, 
+                                collection_name, 
+                                source_types=source_types if source_types else None,
+                                year_range=year_range
+                            )
+                            
                         # Use the retriever chain directly (vector store only)
                         response = qa_chain.invoke(question)
                         

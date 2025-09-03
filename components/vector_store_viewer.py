@@ -32,16 +32,16 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
             st.metric("Segments Count", collection_info.segments_count)
         
         # Debug information
-        st.subheader("🔍 Debug Information")
+        print("🔍 Debug Information")
         col1, col2 = st.columns(2)
         with col1:
-            st.write("**Project Name:**", project_name)
-            st.write("**Collection Name:**", collection_name)
-            st.write("**Qdrant Path:**", str(qdrant_path))
+            print("**Collection Name:**", collection_name)
+            print("**Qdrant Path:**", str(qdrant_path))
+            print("**Project Name:**", project_name)
         with col2:
-            st.write("**Client ID:**", id(client))
-            st.write("**Cache Status:**", "Cached" if hasattr(client, '_cached') else "Fresh")
-            st.write("**Connection Active:**", "✅ Yes" if client.collection_exists(collection_name) else "❌ No")
+            print("**Client ID:**", id(client))
+            print("**Cache Status:**", "Cached" if hasattr(client, '_cached') else "Fresh")
+            print("**Connection Active:**", "✅ Yes" if client.collection_exists(collection_name) else "❌ No")
         
         # Display collection configuration
         st.subheader("⚙️ Collection Configuration")

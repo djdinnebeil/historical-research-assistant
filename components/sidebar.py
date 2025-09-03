@@ -49,8 +49,8 @@ def render_sidebar():
     
     # Preserve navigation choice across project switches
     if "current_nav_choice" not in st.session_state:
-        print("🔧 Sidebar: No current_nav_choice in session state, setting to 'Uploader'")
-        st.session_state["current_nav_choice"] = "Uploader"
+        print("🔧 Sidebar: No current_nav_choice in session state, setting to 'Upload Documents'")
+        st.session_state["current_nav_choice"] = "Upload Documents"
     else:
         print(f"🔧 Sidebar: Current current_nav_choice: {st.session_state['current_nav_choice']}")
 
@@ -113,16 +113,16 @@ def render_sidebar():
     print(f"🔧 Sidebar: Setting up navigation for project: {selected}")
     
     # Define navigation options
-    nav_options = ["Uploader", "Process Pending", "Document Sync", "Vector Store", "Document Manager", "Ask Questions", "Chat History", "Project Management"]
+    nav_options = ["Upload Documents", "Process Pending", "Document Sync", "Document Manager", "Vector Store", "Ask Questions", "Chat History", "Project Management"]
     
     # Safely get the current navigation choice index
-    current_nav = st.session_state.get("current_nav_choice", "Uploader")
+    current_nav = st.session_state.get("current_nav_choice", "Upload Documents")
     try:
         nav_index = nav_options.index(current_nav)
     except ValueError:
-        # If the stored choice is invalid, default to Uploader
+        # If the stored choice is invalid, default to Upload Documents
         nav_index = 0
-        st.session_state["current_nav_choice"] = "Uploader"
+        st.session_state["current_nav_choice"] = "Upload Documents"
     
     nav_choice = st.sidebar.radio(
         "Navigation",

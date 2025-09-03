@@ -8,6 +8,7 @@ from langchain.schema import Document
 from pathlib import Path
 from embedder import embed_documents
 from components.pending_list import render_pending_list
+from components.batch_processor import DocumentBatchProcessor
 
 def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.subheader("⚙️ Process Pending Documents")
@@ -143,10 +144,9 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
         processed_count = 0
         failed_count = 0
         
-        # Initialize batching
+        # Initialize batch processor
         from local_qdrant import BATCH_SIZE
-        staging_buffer = []
-        batch_count = 0
+        batch_processor = DocumentBatchProcessor(BATCH_SIZE, project_name, collection_name)
         
         st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")
         
@@ -192,43 +192,23 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
                 doc = Document(page_content=parsed["page_content"], metadata=parsed["metadata"])
                 docs = adaptive_chunk_documents([doc])
                 
-                # Add content_hash to metadata for tracking
-                for chunk in docs:
-                    if chunk.metadata is None:
-                        chunk.metadata = {}
-                    chunk.metadata['content_hash'] = content_hash
+                # Add document chunks to batch processor
+                updates = batch_processor.add_document(docs, content_hash, len(docs))
+                st.write(f"  📄 Added {len(docs)} chunks to batch (total: {batch_processor.get_buffer_size()})")
                 
-                # Add chunks to staging buffer
-                staging_buffer.extend(docs)
-                st.write(f"  📄 Added {len(docs)} chunks to batch (total: {len(staging_buffer)})")
-                
-                # Flush batch if it's full
-                if len(staging_buffer) >= BATCH_SIZE:
-                    st.write(f"  🚀 Flushing batch of {len(staging_buffer)} chunks...")
+                # Process any database updates if batch was flushed
+                if updates:
+                    st.write(f"  🚀 Batch flushed with {len(updates)} document updates")
                     try:
-                        # Embed and add batch to vector store
-                        n = embed_documents(staging_buffer, project_name, collection_name)
-                        
-                        # Mark all documents in this batch as embedded
-                        for chunk in staging_buffer:
-                            chunk_hash = chunk.metadata.get('content_hash')
-                            if chunk_hash:
-                                update_document_status(con, chunk_hash, len(docs), "embedded")
-                        
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, chunk_count, "embedded")
                         con.commit()
-                        batch_count += 1
-                        st.success(f"  ✅ Batch {batch_count} processed: {len(staging_buffer)} chunks")
-                        
+                        st.success(f"  ✅ Batch {batch_processor.get_batch_count()} processed successfully")
                     except Exception as e:
-                        st.error(f"  ❌ Batch processing failed: {e}")
+                        st.error(f"  ❌ Database update failed: {e}")
                         # Mark documents as error
-                        for chunk in staging_buffer:
-                            chunk_hash = chunk.metadata.get('content_hash')
-                            if chunk_hash:
-                                update_document_status(con, chunk_hash, 0, "error")
-                    
-                    # Clear the buffer
-                    staging_buffer.clear()
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, 0, "error")
                 
                 processed_count += 1
                 
@@ -239,37 +219,28 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
                 failed_count += 1
         
         # Final flush of remaining chunks
-        if staging_buffer:
-            st.write(f"  🚀 Flushing final batch of {len(staging_buffer)} chunks...")
+        final_updates = batch_processor.finalize()
+        if final_updates:
+            st.write(f"  🚀 Flushing final batch with {len(final_updates)} document updates...")
             try:
-                n = embed_documents(staging_buffer, project_name, collection_name)
-                
-                # Mark remaining documents as embedded
-                for chunk in staging_buffer:
-                    chunk_hash = chunk.metadata.get('content_hash')
-                    if chunk_hash:
-                        update_document_status(con, chunk_hash, len(docs), "embedded")
-                
+                for chunk_hash, chunk_count in final_updates:
+                    update_document_status(con, chunk_hash, chunk_count, "embedded")
                 con.commit()
-                batch_count += 1
-                st.success(f"  ✅ Final batch processed: {len(staging_buffer)} chunks")
-                
+                st.success(f"  ✅ Final batch processed successfully")
             except Exception as e:
                 st.error(f"  ❌ Final batch processing failed: {e}")
                 # Mark documents as error
-                for chunk in staging_buffer:
-                    chunk_hash = chunk.metadata.get('content_hash')
-                    if chunk_hash:
-                        update_document_status(con, chunk_hash, 0, "error")
+                for chunk_hash, chunk_count in final_updates:
+                    update_document_status(con, chunk_hash, 0, "error")
 
         # Final status
         progress_bar.progress(1.0)
         status_text.text("Processing complete!")
         
         if failed_count == 0:
-            st.success(f"🎉 All {processed_count} pending documents processed successfully in {batch_count} batch(es)!")
+            st.success(f"🎉 All {processed_count} pending documents processed successfully in {batch_processor.get_batch_count()} batch(es)!")
         else:
-            st.warning(f"⚠️ Processing complete: {processed_count} successful, {failed_count} failed in {batch_count} batch(es)")
+            st.warning(f"⚠️ Processing complete: {processed_count} successful, {failed_count} failed in {batch_processor.get_batch_count()} batch(es)")
             
         # Show final database state
         st.subheader("📊 Final Database Status")
@@ -292,7 +263,7 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
         st.subheader("🔍 Database Change Summary")
         st.write(f"Documents processed: {processed_count}")
         st.write(f"Documents failed: {failed_count}")
-        st.write(f"Batches processed: {batch_count}")
+        st.write(f"Batches processed: {batch_processor.get_batch_count()}")
         st.write(f"Pending before: {len(initial_pending)}, after: {len(final_pending)}")
         st.write(f"Embedded before: {len(initial_embedded)}, after: {len(final_embedded)}")
         

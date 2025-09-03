@@ -6,6 +6,7 @@ from text_parsers.unified_parser import parse_file
 from local_qdrant import adaptive_chunk_documents
 from embedder import embed_documents
 from langchain.schema import Document
+from components.batch_processor import DocumentBatchProcessor
 
 def get_file_hash(file_path: Path) -> str:
     """Compute SHA256 hash for file content."""
@@ -78,13 +79,9 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     processed_count = 0
     errors = []
     
-    # Initialize batching
+    # Initialize batch processor
     from local_qdrant import BATCH_SIZE
-    staging_buffer = []
-    batch_count = 0
-    
-    # Track chunk counts for each document
-    document_chunk_counts = {}
+    batch_processor = DocumentBatchProcessor(BATCH_SIZE, proj_dir.name, collection_name)
     
     st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")
     
@@ -126,54 +123,27 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
                 # Chunk the documents
                 chunked_docs = adaptive_chunk_documents(docs)
                 
-                # Store the chunk count for this document
-                document_chunk_counts[file_hash] = len(chunked_docs)
-                
-                # Update database with chunk count
+                # Update database with chunk count and pending status
                 update_document_status(con, file_hash, len(chunked_docs), "pending")
                 
-                # Add content_hash to metadata for tracking
-                for chunk in chunked_docs:
-                    if chunk.metadata is None:
-                        chunk.metadata = {}
-                    chunk.metadata['content_hash'] = file_hash
+                # Add document chunks to batch processor
+                updates = batch_processor.add_document(chunked_docs, file_hash, len(chunked_docs))
+                st.write(f"  📄 Added {len(chunked_docs)} chunks to batch (total: {batch_processor.get_buffer_size()})")
                 
-                # Add chunks to staging buffer
-                staging_buffer.extend(chunked_docs)
-                st.write(f"  📄 Added {len(chunked_docs)} chunks to batch (total: {len(staging_buffer)})")
-                
-                # Flush batch if it's full
-                if len(staging_buffer) >= BATCH_SIZE:
-                    st.write(f"  🚀 Flushing batch of {len(staging_buffer)} chunks...")
+                # Process any database updates if batch was flushed
+                if updates:
+                    st.write(f"  🚀 Batch flushed with {len(updates)} document updates")
                     try:
-                        # Embed and add to vector store
-                        embed_documents(
-                            staging_buffer, 
-                            proj_dir.name, 
-                            collection_name
-                        )
-                        
-                        # Mark all documents in this batch as embedded with their correct chunk counts
-                        for chunk in staging_buffer:
-                            chunk_hash = chunk.metadata.get('content_hash')
-                            if chunk_hash and chunk_hash in document_chunk_counts:
-                                update_document_status(con, chunk_hash, document_chunk_counts[chunk_hash], "embedded")
-                        
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, chunk_count, "embedded")
                         con.commit()
-                        batch_count += 1
-                        st.success(f"  ✅ Batch {batch_count} processed: {len(staging_buffer)} chunks")
-                        
+                        st.success(f"  ✅ Batch {batch_processor.get_batch_count()} processed successfully")
                     except Exception as e:
-                        st.error(f"  ❌ Batch processing failed: {e}")
-                        errors.append(f"Batch processing error: {e}")
+                        st.error(f"  ❌ Database update failed: {e}")
+                        errors.append(f"Database update error: {e}")
                         # Mark documents as error
-                        for chunk in staging_buffer:
-                            chunk_hash = chunk.metadata.get('content_hash')
-                            if chunk_hash:
-                                update_document_status(con, chunk_hash, 0, "error")
-                    
-                    # Clear the buffer
-                    staging_buffer.clear()
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, 0, "error")
                 
                 processed_count += 1
                 
@@ -189,40 +159,27 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
             errors.append(f"Unexpected error for {file_info['path'].name}: {e}")
     
     # Final flush of remaining chunks
-    if staging_buffer:
-        st.write(f"  🚀 Flushing final batch of {len(staging_buffer)} chunks...")
+    final_updates = batch_processor.finalize()
+    if final_updates:
+        st.write(f"  🚀 Flushing final batch with {len(final_updates)} document updates...")
         try:
-            embed_documents(
-                staging_buffer, 
-                proj_dir.name, 
-                collection_name
-            )
-            
-            # Mark remaining documents as embedded with their correct chunk counts
-            for chunk in staging_buffer:
-                chunk_hash = chunk.metadata.get('content_hash')
-                if chunk_hash and chunk_hash in document_chunk_counts:
-                    update_document_status(con, chunk_hash, document_chunk_counts[chunk_hash], "embedded")
-            
+            for chunk_hash, chunk_count in final_updates:
+                update_document_status(con, chunk_hash, chunk_count, "embedded")
             con.commit()
-            batch_count += 1
-            st.success(f"  ✅ Final batch processed: {len(staging_buffer)} chunks")
-            
+            st.success(f"  ✅ Final batch processed successfully")
         except Exception as e:
             st.error(f"  ❌ Final batch processing failed: {e}")
             errors.append(f"Final batch processing error: {e}")
             # Mark documents as error
-            for chunk in staging_buffer:
-                chunk_hash = chunk.metadata.get('content_hash')
-                if chunk_hash:
-                    update_document_status(con, chunk_hash, 0, "error")
+            for chunk_hash, chunk_count in final_updates:
+                update_document_status(con, chunk_hash, 0, "error")
     
     # Final status
     progress_bar.progress(1.0)
     status_text.text("Sync complete!")
     
     if processed_count > 0:
-        st.success(f"✅ Successfully processed {processed_count} document(s) in {batch_count} batch(es)")
+        st.success(f"✅ Successfully processed {processed_count} document(s) in {batch_processor.get_batch_count()} batch(es)")
     
     if errors:
         st.error(f"❌ {len(errors)} error(s) occurred:")

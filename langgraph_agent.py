@@ -11,6 +11,7 @@ from retriever_chain import load_chain
 from typing import Annotated
 from langgraph.graph.message import add_messages
 import config
+from config import using_cohere
 
 # ✅ Cache the chain so it reuses the same Qdrant client
 @st.cache_resource
@@ -75,7 +76,12 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
         print(f"🔍 **Tool Debug:** Source types filter: {source_types}")
         print(f"🔍 **Tool Debug:** Year range filter: {year_range}")
         
-        qa_chain, naive_retriever = get_chains(project_name, collection_name, source_types, year_range)
+        if using_cohere:
+            qa_chain, naive_retriever, compression_retriever = get_chains(project_name, collection_name, source_types, year_range)
+        else:
+            qa_chain, naive_retriever = get_chains(project_name, collection_name, source_types, year_range)
+            
+        # qa_chain, naive_retriever = get_chains(project_name, collection_name, source_types, year_range)
         response = qa_chain.invoke(question)
         
         # Extract result and source documents
