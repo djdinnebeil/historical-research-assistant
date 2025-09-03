@@ -2,7 +2,7 @@ import streamlit as st
 import json
 from pathlib import Path
 from db import file_sha256_from_buffer, insert_document, document_exists
-from text_parsers.unified_parser import parse_file
+from components.text_parsers.unified_parser import parse_file
 
 def render_journals_uploader(proj_dir: Path, con):
     st.subheader("📰 Upload a Journal Article")

@@ -2,7 +2,7 @@ import streamlit as st
 from pathlib import Path
 import hashlib
 from db import document_exists, insert_document, update_document_status
-from text_parsers.unified_parser import parse_file
+from components.text_parsers.unified_parser import parse_file
 from local_qdrant import adaptive_chunk_documents
 from embedder import embed_documents
 from langchain.schema import Document

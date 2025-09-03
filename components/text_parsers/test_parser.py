@@ -5,13 +5,13 @@ from pathlib import Path
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from text_parsers.book_parser import parse_book
-from text_parsers.journal_parser import parse_journal_article
-from text_parsers.newspaper_parser import parse_newspaper_article
-from text_parsers.report_parser import parse_report
-from text_parsers.web_article_parser import parse_web_article
-from text_parsers.unsorted_parser import parse_unsorted
-from text_parsers.misc_parser import parse_misc
+from components.text_parsers.book_parser import parse_book
+from components.text_parsers.journal_parser import parse_journal_article
+from components.text_parsers.newspaper_parser import parse_newspaper_article
+from components.text_parsers.report_parser import parse_report
+from components.text_parsers.web_article_parser import parse_web_article
+from components.text_parsers.unsorted_parser import parse_unsorted
+from components.text_parsers.misc_parser import parse_misc
 
 
 DISPATCH = {

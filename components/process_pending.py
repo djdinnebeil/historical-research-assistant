@@ -1,6 +1,6 @@
 import streamlit as st
 from db import list_documents_by_status, update_document_status
-from text_parsers.unified_parser import parse_file
+from components.text_parsers.unified_parser import parse_file
 from local_qdrant import get_qdrant_client, adaptive_chunk_documents
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant

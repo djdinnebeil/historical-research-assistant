@@ -13,7 +13,7 @@ from qdrant_client import QdrantClient
 from tqdm import tqdm
 from qdrant_client.models import VectorParams, Distance
 
-from text_parsers.unified_parser import parse_file
+from components.text_parsers.unified_parser import parse_file
 from db import *
 import streamlit as st
 
