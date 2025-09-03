@@ -14,7 +14,7 @@ from tqdm import tqdm
 from qdrant_client.models import VectorParams, Distance
 
 from components.text_parsers.unified_parser import parse_file
-from db import *
+from core.database import *
 import streamlit as st
 
 # --- Settings ---
@@ -295,3 +295,94 @@ def delete_document_from_store(con, client, collection_name: str, doc_id: str) -
     # 2. Delete from SQLite
     delete_document(con, doc_id)
     print(f"Deleted document {doc_id} from DB and Qdrant.")
+
+
+# --- Lock Management Functions (merged from clear_qdrant_locks.py) ---
+
+def clear_qdrant_locks():
+    """Clear any existing Qdrant locks and force cleanup."""
+    print("🔧 Clearing Qdrant locks and connections...")
+    
+    try:
+        # Force close all clients
+        force_close_all_clients()
+        
+        # Clear the cache
+        clear_qdrant_cache()
+        
+        # Force clear locks for all projects
+        projects_dir = Path.cwd() / "projects"
+        if projects_dir.exists():
+            for project_dir in projects_dir.iterdir():
+                if project_dir.is_dir():
+                    project_name = project_dir.name
+                    print(f"🔓 Clearing locks for project: {project_name}")
+                    force_clear_qdrant_locks(project_name)
+        
+        print("✅ Successfully cleared Qdrant locks and connections")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error clearing Qdrant locks: {e}")
+        return False
+
+
+def check_qdrant_processes():
+    """Check if there are any Qdrant processes running."""
+    print("🔍 Checking for Qdrant processes...")
+    
+    try:
+        import psutil
+        
+        qdrant_processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                if 'qdrant' in proc.info['name'].lower():
+                    qdrant_processes.append(proc.info)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+        
+        if qdrant_processes:
+            print(f"⚠️  Found {len(qdrant_processes)} Qdrant processes:")
+            for proc in qdrant_processes:
+                print(f"   PID {proc['pid']}: {proc['name']}")
+            return True
+        else:
+            print("✅ No Qdrant processes found")
+            return False
+            
+    except ImportError:
+        print("⚠️  psutil not available, skipping process check")
+        return False
+
+
+def main_lock_cleanup():
+    """Main function to clear Qdrant locks (for CLI usage)."""
+    print("🚀 Qdrant Lock Cleanup Utility")
+    print("=" * 40)
+    
+    # Check for processes first
+    has_processes = check_qdrant_processes()
+    
+    # Clear locks
+    success = clear_qdrant_locks()
+    
+    if has_processes:
+        print("\n⚠️  Note: Qdrant processes were detected.")
+        print("   You may need to restart your application or kill these processes manually.")
+    
+    if success:
+        print("\n✅ Cleanup completed successfully!")
+        print("   You can now try running your application again.")
+    else:
+        print("\n❌ Cleanup failed. You may need to:")
+        print("   1. Restart your terminal/IDE")
+        print("   2. Kill any remaining Qdrant processes")
+        print("   3. Restart your application")
+    
+    return 0 if success else 1
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main_lock_cleanup())

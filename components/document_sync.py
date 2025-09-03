@@ -1,12 +1,12 @@
 import streamlit as st
 from pathlib import Path
 import hashlib
-from db import document_exists, insert_document, update_document_status
+from core.database import document_exists, insert_document, update_document_status
 from components.text_parsers.unified_parser import parse_file
-from local_qdrant import adaptive_chunk_documents
-from embedder import embed_documents
+from core.vector_store import adaptive_chunk_documents
+from core.embedder import embed_documents
 from langchain.schema import Document
-from components.batch_processor import DocumentBatchProcessor
+from core.batch_processor import DocumentBatchProcessor
 
 def get_file_hash(file_path: Path) -> str:
     """Compute SHA256 hash for file content."""
@@ -80,7 +80,7 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     errors = []
     
     # Initialize batch processor
-    from local_qdrant import BATCH_SIZE
+    from core.vector_store import BATCH_SIZE
     batch_processor = DocumentBatchProcessor(BATCH_SIZE, proj_dir.name, collection_name)
     
     st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")
@@ -188,7 +188,7 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     
     # Show final database state
     st.subheader("📊 Final Database State")
-    from db import list_documents_by_status
+    from core.database import list_documents_by_status
     final_pending = list_documents_by_status(con, "pending")
     final_embedded = list_documents_by_status(con, "embedded")
     final_error = list_documents_by_status(con, "error")

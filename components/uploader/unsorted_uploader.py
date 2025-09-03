@@ -1,6 +1,6 @@
 import streamlit as st
 from pathlib import Path
-from db import file_sha256_from_buffer, insert_document, document_exists
+from core.database import file_sha256_from_buffer, insert_document, document_exists
 from components.text_parsers.unified_parser import parse_file
 
 def render_unsorted_uploader(proj_dir: Path, con):

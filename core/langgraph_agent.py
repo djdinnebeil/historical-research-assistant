@@ -7,7 +7,7 @@ from langgraph.prebuilt import ToolNode
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search import TavilySearchResults
-from retriever_chain import load_chain
+from core.retriever_chain import load_chain
 from typing import Annotated
 from langgraph.graph.message import add_messages
 import config

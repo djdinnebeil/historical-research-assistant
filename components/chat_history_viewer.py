@@ -9,7 +9,7 @@ def render_chat_history_viewer(con, project_name: str):
     st.markdown(f"Viewing chat history for project: **{project_name}**")
     
     # Get chat history from database
-    from db import get_chat_history, delete_chat_entry, clear_chat_history, get_chat_history_count
+    from core.database import get_chat_history, delete_chat_entry, clear_chat_history, get_chat_history_count
     
     chat_entries = get_chat_history(con, project_name)
     chat_count = get_chat_history_count(con, project_name)

@@ -15,7 +15,7 @@ from qdrant_client.http import models as qdrant_models
 
 
 
-from local_qdrant import get_qdrant_client, ensure_collection
+from core.vector_store import get_qdrant_client, ensure_collection
 
 prompt = PromptTemplate(
     template="""You are a helpful historical research assistant.

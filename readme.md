@@ -157,7 +157,6 @@ COHERE_API_KEY=your_cohere_api_key
 ```
 historical_research_assistant/
 ├── components/          # UI components
-├── text_parsers/        # Document parsers
 ├── projects/           # Active projects
 ├── archive/            # Archived projects
 ├── app.py              # Main application

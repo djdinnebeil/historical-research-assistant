@@ -1,6 +1,6 @@
 import streamlit as st
-from db import list_all_documents, delete_document
-from local_qdrant import get_qdrant_client
+from core.database import list_all_documents, delete_document
+from core.vector_store import get_qdrant_client
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
 from pathlib import Path

@@ -1,14 +1,14 @@
 import streamlit as st
-from db import list_documents_by_status, update_document_status
+from core.database import list_documents_by_status, update_document_status
 from components.text_parsers.unified_parser import parse_file
-from local_qdrant import get_qdrant_client, adaptive_chunk_documents
+from core.vector_store import get_qdrant_client, adaptive_chunk_documents
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
 from langchain.schema import Document
 from pathlib import Path
-from embedder import embed_documents
+from core.embedder import embed_documents
 from components.pending_list import render_pending_list
-from components.batch_processor import DocumentBatchProcessor
+from core.batch_processor import DocumentBatchProcessor
 
 def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.subheader("⚙️ Process Pending Documents")
@@ -145,7 +145,7 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
         failed_count = 0
         
         # Initialize batch processor
-        from local_qdrant import BATCH_SIZE
+        from core.vector_store import BATCH_SIZE
         batch_processor = DocumentBatchProcessor(BATCH_SIZE, project_name, collection_name)
         
         st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")

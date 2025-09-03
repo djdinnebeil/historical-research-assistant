@@ -1,5 +1,5 @@
 import streamlit as st
-from db import list_documents_by_status
+from core.database import list_documents_by_status
 
 COLUMNS = [
     "id", "path", "citation", "source_type", "source_id",

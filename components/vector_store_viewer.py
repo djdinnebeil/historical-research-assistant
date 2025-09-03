@@ -2,7 +2,7 @@ import streamlit as st
 from qdrant_client import QdrantClient
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
-from local_qdrant import get_qdrant_client, clear_qdrant_cache
+from core.vector_store import get_qdrant_client, clear_qdrant_cache
 import json
 
 def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):

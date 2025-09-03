@@ -1,8 +1,8 @@
 import streamlit as st
 import shutil
 from pathlib import Path
-from db import ensure_db, set_project_db
-from local_qdrant import get_qdrant_client, clear_qdrant_cache
+from core.database import ensure_db, set_project_db
+from core.vector_store import get_qdrant_client, clear_qdrant_cache
 
 # Use absolute paths to avoid relative path resolution issues
 PROJECTS_DIR = Path.cwd() / "projects"

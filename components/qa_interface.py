@@ -186,7 +186,7 @@ def render_qa_interface(project_name: str, collection_name: str):
 
                     if mode == "Standard":
                         # Standard mode: Use only the retriever chain (vector store)
-                        from retriever_chain import load_chain
+                        from core.retriever_chain import load_chain
                         
                         # Load the chain for the current project with filters
                         year_range = None
@@ -246,7 +246,7 @@ def render_qa_interface(project_name: str, collection_name: str):
                         
                     else:  # Advanced mode
                         # Advanced mode: Use the agent graph with web search
-                        from langgraph_agent import build_agent_graph
+                        from core.langgraph_agent import build_agent_graph
                         from langchain_core.messages import HumanMessage
                         
                         # Build the agent graph (already compiled)
@@ -392,7 +392,7 @@ This is a mandatory requirement - you cannot skip either tool."""
                         }
                         
                         # Save to database
-                        from db import insert_chat_entry
+                        from core.database import insert_chat_entry
                         # Get database connection from session state
                         if "db_client" in st.session_state:
                             con, _ = st.session_state.db_client

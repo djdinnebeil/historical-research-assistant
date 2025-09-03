@@ -1,5 +1,5 @@
-from embedder import embed_documents
-from db import update_document_status
+from core.embedder import embed_documents
+from core.database import update_document_status
 
 class DocumentBatchProcessor:
     """Handles batching of document chunks for vector store processing."""
