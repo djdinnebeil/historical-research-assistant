@@ -2,7 +2,7 @@ import streamlit as st
 from pathlib import Path
 from core.database import ensure_db, set_project_db
 from core.vector_store import get_qdrant_client, clear_qdrant_cache
-from config import get_logger
+from config import get_logger, developer_mode
 
 logger = get_logger(__name__)
 
@@ -115,8 +115,10 @@ def render_sidebar():
     logger.debug(f"Setting up navigation for project: {selected}")
     
     # Define navigation options
-    nav_options = ["Upload Documents", "Process Pending", "Document Sync", "Document Manager", "Vector Store", "Ask Questions", "Chat History", "Project Management"]
-    
+    if developer_mode:
+        nav_options = ["Upload Documents", "Process Pending", "Document Sync", "Document Manager", "Vector Store", "Ask Questions", "Chat History", "Project Management"]
+    else:
+        nav_options = ["Upload Documents", "Document Sync", "Document Manager", "Ask Questions", "Chat History", "Project Management"]
     # Safely get the current navigation choice index
     current_nav = st.session_state.get("current_nav_choice", "Upload Documents")
     try:

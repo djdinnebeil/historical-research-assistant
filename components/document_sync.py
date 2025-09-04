@@ -1,7 +1,7 @@
 import streamlit as st
 from pathlib import Path
 import hashlib
-from core import document_exists, insert_document, update_document_status, adaptive_chunk_documents, embed_documents, DocumentBatchProcessor
+from core import document_exists, insert_document, update_document_status, adaptive_chunk_documents, embed_documents, DocumentBatchProcessor, list_documents_by_status
 from components.text_parsers.unified_parser import parse_file
 from langchain.schema import Document
 
@@ -37,37 +37,58 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     """Sync documents from the documents folder to the database and vector store."""
     st.subheader("🔄 Document Sync")
     
+    # Check for pending documents first
+    pending_docs = list_documents_by_status(con, "pending")
+    # st.write(f"Found {len(pending_docs)} pending document(s).")
+    # st.write(f"📋 Pending documents to process: {len(pending_docs)}")
+    
     # Scan documents folder
     with st.spinner("Scanning documents folder..."):
         text_files = scan_documents_folder(proj_dir)
     
-    if not text_files:
-        st.info("No text files found in the documents folder.")
+    if not text_files and not pending_docs:
+        st.info("No text files found in the documents folder and no pending documents to process.")
         return
     
-    st.write(f"Found {len(text_files)} text file(s) in the documents folder.")
+    if text_files:
+        # st.write(f"Found {len(text_files)} text file(s) in the documents folder.")
+        
+        # Check which files are new or changed
+        new_files = []
+        existing_files = []
+        
+        for file_info in text_files:
+            if document_exists(con, file_info['hash']):
+                existing_files.append(file_info)
+            else:
+                new_files.append(file_info)
+        
+        # st.write(f"📁 New files to process: {len(new_files)}")
+        # st.write(f"✅ Already processed: {len(existing_files)}")
+    else:
+        new_files = []
+        existing_files = []
+        st.write("No new files found in the documents folder.")
     
-    # Check which files are new or changed
-    new_files = []
-    existing_files = []
-    
-    for file_info in text_files:
-        if document_exists(con, file_info['hash']):
-            existing_files.append(file_info)
-        else:
-            new_files.append(file_info)
-    
-    st.write(f"📁 New files to process: {len(new_files)}")
-    st.write(f"✅ Already processed: {len(existing_files)}")
-    
-    if not new_files:
+    if not new_files and not pending_docs:
         st.success("All documents are already synced!")
         return
     
     # Show new files
-    st.subheader("📋 New Files to Process")
-    for file_info in new_files:
-        st.write(f"• {file_info['path'].name} ({file_info['size']} bytes)")
+    if new_files:
+        st.subheader("📋 New Files to Process")
+        for file_info in new_files:
+            st.write(f"• {file_info['path'].name} ({file_info['size']} bytes)")
+    
+    # Show pending documents
+    if pending_docs:
+        st.subheader("📋 Pending Documents to Process")
+        for row in pending_docs:
+            path = row[1]  # path is at index 1
+            st.write(f"• {path}")
+    
+    # Calculate total items to process
+    total_items = len(new_files) + len(pending_docs)
     
     # Start processing with batching
     progress_bar = st.progress(0)
@@ -82,15 +103,16 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     
     st.info(f"📦 Using batch processing with batch size: {BATCH_SIZE}")
     
+    # Process new files first
     for i, file_info in enumerate(new_files):
         try:
             file_path = file_info['path']
             file_hash = file_info['hash']
             
             # Update progress
-            progress = (i + 1) / len(new_files)
+            progress = (i + 1) / total_items
             progress_bar.progress(progress)
-            status_text.text(f"Processing {file_path.name}... ({i+1}/{len(new_files)})")
+            status_text.text(f"Processing new file {file_path.name}... ({i+1}/{total_items})")
             
             # Parse the file
             try:
@@ -155,6 +177,74 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
             st.error(f"Unexpected error processing {file_info['path'].name}: {e}")
             errors.append(f"Unexpected error for {file_info['path'].name}: {e}")
     
+    # Process pending documents
+    for i, row in enumerate(pending_docs):
+        try:
+            # Extract row data - content_hash is at index 6, not 5
+            path, citation, source_type, source_id, date, num_chunks, content_hash, status, added_at = row[1:10]
+            
+            # Update progress
+            progress = (len(new_files) + i + 1) / total_items
+            progress_bar.progress(progress)
+            status_text.text(f"Processing pending document {path}... ({len(new_files) + i + 1}/{total_items})")
+            
+            # Parse the file
+            file_path = proj_dir / "documents" / path
+            if not file_path.exists():
+                st.error(f"❌ File not found: {file_path}")
+                errors.append(f"File not found: {file_path}")
+                continue
+            
+            try:
+                parsed = parse_file(str(file_path))
+            except Exception as e:
+                st.error(f"Failed to parse {path}: {e}")
+                errors.append(f"Parse error in {path}: {e}")
+                continue
+            
+            # Process for vector store
+            try:
+                # Create Document objects for LangChain
+                docs = [Document(
+                    page_content=parsed['page_content'],
+                    metadata=parsed['metadata']
+                )]
+                
+                # Chunk the documents
+                chunked_docs = adaptive_chunk_documents(docs)
+                
+                # Add document chunks to batch processor
+                updates = batch_processor.add_document(chunked_docs, content_hash, len(chunked_docs))
+                st.write(f"  📄 Added {len(chunked_docs)} chunks to batch (total: {batch_processor.get_buffer_size()})")
+                
+                # Process any database updates if batch was flushed
+                if updates:
+                    st.write(f"  🚀 Batch flushed with {len(updates)} document updates")
+                    try:
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, chunk_count, "embedded")
+                        con.commit()
+                        st.success(f"  ✅ Batch {batch_processor.get_batch_count()} processed successfully")
+                    except Exception as e:
+                        st.error(f"  ❌ Database update failed: {e}")
+                        errors.append(f"Database update error: {e}")
+                        # Mark documents as error
+                        for chunk_hash, chunk_count in updates:
+                            update_document_status(con, chunk_hash, 0, "error")
+                
+                processed_count += 1
+                
+            except Exception as e:
+                st.error(f"Failed to process {path} for vector store: {e}")
+                errors.append(f"Vector store error for {path}: {e}")
+                # Mark as error in database
+                update_document_status(con, content_hash, 0, "error")
+                continue
+            
+        except Exception as e:
+            st.error(f"Unexpected error processing pending document {row[1] if len(row) > 1 else 'unknown'}: {e}")
+            errors.append(f"Unexpected error for pending document: {e}")
+    
     # Final flush of remaining chunks
     final_updates = batch_processor.finalize()
     if final_updates:
@@ -177,6 +267,12 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     
     if processed_count > 0:
         st.success(f"✅ Successfully processed {processed_count} document(s) in {batch_processor.get_batch_count()} batch(es)")
+        if new_files and pending_docs:
+            st.info(f"📊 Processed {len(new_files)} new files and {len(pending_docs)} pending documents")
+        elif new_files:
+            st.info(f"📊 Processed {len(new_files)} new files")
+        elif pending_docs:
+            st.info(f"📊 Processed {len(pending_docs)} pending documents")
     
     if errors:
         st.error(f"❌ {len(errors)} error(s) occurred:")
@@ -185,7 +281,6 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     
     # Show final database state
     st.subheader("📊 Final Database State")
-    from core.database import list_documents_by_status
     final_pending = list_documents_by_status(con, "pending")
     final_embedded = list_documents_by_status(con, "embedded")
     final_error = list_documents_by_status(con, "error")
@@ -196,11 +291,21 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
     
     if final_error:
         st.warning("Some documents had errors during processing. Check the error logs above.")
+    
+    # Show summary of what was processed
+    if new_files or pending_docs:
+        st.subheader("📋 Processing Summary")
+        if new_files:
+            st.write(f"• New files processed: {len(new_files)}")
+        if pending_docs:
+            st.write(f"• Pending documents processed: {len(pending_docs)}")
+        st.write(f"• Total documents processed: {processed_count}")
+        st.write(f"• Batches used: {batch_processor.get_batch_count()}")
 
 def render_document_sync(proj_dir: Path, con, collection_name: str):
     """Main render function for the document sync component."""
     st.subheader("🔄 Document Sync")
-    st.write("This tool will scan your project's documents folder and automatically sync any new or changed documents to the database and vector store.")
+    st.write("This tool will scan your project's documents folder and automatically sync any new or changed documents to the database and vector store. It will also process any documents with 'pending' status.")
     
     # Show current documents folder structure
     documents_dir = proj_dir / "documents"
@@ -211,11 +316,46 @@ def render_document_sync(proj_dir: Path, con, collection_name: str):
         txt_files = list(documents_dir.rglob("*.txt"))
         st.write(f"**Text files found:** {len(txt_files)}")
         
-        if txt_files:
-            st.write("**File structure:**")
-            for file_path in sorted(txt_files):
-                relative_path = file_path.relative_to(documents_dir)
+        text_files = scan_documents_folder(proj_dir)
+        new_files = []
+        existing_files = []
+
+        if text_files:            
+            # Check which files are new or changed
+            for file_info in text_files:
+                if document_exists(con, file_info['hash']):
+                    existing_files.append(file_info)
+                else:
+                    new_files.append(file_info)
+        
+        st.write(f"New files to process: {len(new_files)}")
+
+        pending_docs = list_documents_by_status(con, "pending")
+        st.write(f"Pending documents found: {len(pending_docs)}")
+
+        if new_files:
+            st.write("**New files:**")
+            for file_path in new_files:
+                relative_path = file_path['path'].relative_to(documents_dir)
                 st.write(f"• `{relative_path}`")
+
+                # st.write(file_path)
+                # relative_path = file_path.relative_to(documents_dir)
+                # st.write(f"• `{relative_path}`")
+
+        if pending_docs:
+            st.write("**Pending documents structure:**")
+            for file_path in pending_docs:
+                print(file_path)
+                st.write(f"• `{file_path[1]}`")
+                # relative_path = file_path.relative_to(documents_dir)
+                # st.write(f"• `{relative_path}`")
+
+        # if txt_files:
+        #     st.write("**File structure:**")
+        #     for file_path in sorted(txt_files):
+        #         relative_path = file_path.relative_to(documents_dir)
+        #         st.write(f"• `{relative_path}`")
     else:
         st.warning("Documents folder not found. Please create it first.")
         return

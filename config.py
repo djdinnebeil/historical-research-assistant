@@ -18,7 +18,10 @@ os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 # =============================================================================
 
 # Feature flags
-using_cohere = False
+using_cohere = True
+
+# Developer mode
+developer_mode = False
 
 # Directory paths
 PROJECTS_DIR = Path.cwd() / "projects"
