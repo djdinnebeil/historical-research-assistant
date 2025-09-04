@@ -1,5 +1,6 @@
 import streamlit as st
 from config import using_cohere
+from utils.document_sync_utils import get_document_sync_status
 
 def render_qa_interface(project_name: str, collection_name: str):
     """Render the question-answering interface using the LangGraph agent."""
@@ -14,6 +15,16 @@ def render_qa_interface(project_name: str, collection_name: str):
     
     st.header("🤖 Ask Questions")
     st.markdown("Ask questions about your historical documents and get AI-powered answers that combine historical context with current information.")
+    
+    # Check for pending documents and new files
+    if "db_client" in st.session_state and project_name and project_name != "-- New Project --":
+        from pathlib import Path
+        proj_dir = Path("projects") / project_name
+        con, _ = st.session_state.db_client
+        
+        sync_status = get_document_sync_status(proj_dir, con)
+        if sync_status['needs_sync']:
+            st.warning(f"📋 **Document Sync Needed:** You have {sync_status['new_files_count']} new files and {sync_status['pending_documents_count']} pending documents to sync. Consider running the Document Sync tool to ensure all your documents are available for queries.")
     
     # Mode selection toggle
     st.subheader("🔧 Select Mode")

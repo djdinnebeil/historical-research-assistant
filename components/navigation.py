@@ -42,7 +42,7 @@ def render_page(nav_choice: str, selected: str, proj_dir, db_client, collection_
     elif nav_choice == "Vector Store":
         render_vector_store_viewer(proj_dir, proj_dir / "qdrant", collection_name)
     elif nav_choice == "Document Manager":
-        render_document_manager(proj_dir, con, collection_name)
+        render_document_manager(proj_dir, con, collection_name, selected)
     elif nav_choice == "Ask Questions":
         render_qa_interface(selected, collection_name)
     elif nav_choice == "Chat History":

@@ -78,20 +78,28 @@ def document_exists(con: sqlite3.Connection, content_hash: str) -> bool:
 def insert_document(con: sqlite3.Connection, path: Path, parsed: dict, content_hash: str, num_chunks: int) -> None:
     """Insert a new document record with its metadata + chunk count."""
     md = parsed['metadata']
-    con.execute("""
-    INSERT INTO documents (path, citation, source_type, source_id, date, content_hash, num_chunks, status, added_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        str(path),
-        md.get('citation'),
-        md.get('source_type'),
-        md.get('source_id'),
-        md.get('date'),
-        content_hash,
-        num_chunks,
-        'pending',
-        datetime.utcnow().isoformat()
-    ))
+    try:
+        con.execute("""
+        INSERT INTO documents (path, citation, source_type, source_id, date, content_hash, num_chunks, status, added_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            str(path),
+            md.get('citation'),
+            md.get('source_type'),
+            md.get('source_id'),
+            md.get('date'),
+            content_hash,
+            num_chunks,
+            'pending',
+            datetime.utcnow().isoformat()
+        ))
+    except sqlite3.IntegrityError as e:
+        if "UNIQUE constraint failed: documents.content_hash" in str(e):
+            # Check if this is a duplicate path or content hash
+            existing = con.execute("SELECT path, content_hash FROM documents WHERE content_hash = ?", (content_hash,)).fetchone()
+            if existing:
+                raise sqlite3.IntegrityError(f"Document with content hash {content_hash} already exists in database. Path: {existing[0]}, Attempted path: {path}")
+        raise
 
 def update_document_status(con, content_hash: str, num_chunks: int, status: str = "embedded") -> None:
     """Update chunk count and status for a document after processing."""

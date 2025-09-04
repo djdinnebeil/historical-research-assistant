@@ -5,6 +5,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from pathlib import Path
 import json
+from utils.document_sync_utils import get_document_sync_status
 
 COLUMNS = [
     "id", "path", "citation", "source_type", "source_id",
@@ -42,9 +43,19 @@ def debug_vector_metadata(client, collection_name):
 
 
 
-def render_document_manager(proj_dir, con, collection_name):
+def render_document_manager(proj_dir, con, collection_name, project_name):
     st.subheader("📚 Document Manager")
     
+    # Check for pending documents and new files
+    if "db_client" in st.session_state and project_name and project_name != "-- New Project --":
+        from pathlib import Path
+        proj_dir = Path("projects") / project_name
+        con, _ = st.session_state.db_client
+        
+        sync_status = get_document_sync_status(proj_dir, con)
+        if sync_status['needs_sync']:
+            st.warning(f"📋 **Document Sync Needed:** You have {sync_status['new_files_count']} new files and {sync_status['pending_documents_count']} pending documents to sync. Consider running the Document Sync tool to ensure all your documents are available for queries.")
+
     # Get all documents from database
     try:
         all_documents = list_all_documents(con)
