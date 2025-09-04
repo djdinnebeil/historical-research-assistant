@@ -8,7 +8,7 @@ from pathlib import Path
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from tqdm import tqdm
 from qdrant_client.models import VectorParams, Distance
@@ -17,8 +17,10 @@ from components.text_parsers.unified_parser import parse_file
 from core.database import *
 import streamlit as st
 
-# --- Settings ---
-BATCH_SIZE = 12                          # tune for performance
+# Import settings from config
+from config import BATCH_SIZE, get_logger
+
+logger = get_logger(__name__)
 
 # Global client registry to track active clients
 _active_clients = {}
@@ -38,12 +40,12 @@ def force_close_all_clients():
     for client_key, client in list(_active_clients.items()):
         try:
             client.close()
-            print(f"Closed client: {client_key}")
+            logger.debug(f"Closed client: {client_key}")
         except Exception as e:
-            print(f"Error closing client {client_key}: {e}")
+            logger.error(f"Error closing client {client_key}: {e}")
         finally:
             del _active_clients[client_key]
-    print("All Qdrant clients closed")
+    logger.info("All Qdrant clients closed")
 
 def close_qdrant_client(project_name: str):
     """Close a specific Qdrant client for a project."""
@@ -69,13 +71,13 @@ def force_clear_qdrant_locks(project_name: str):
         for lock_file in lock_files:
             try:
                 os.remove(lock_file)
-                print(f"Removed lock file: {lock_file}")
+                logger.debug(f"Removed lock file: {lock_file}")
             except Exception as e:
-                print(f"Could not remove lock file {lock_file}: {e}")
+                logger.warning(f"Could not remove lock file {lock_file}: {e}")
         
         # Wait a bit for the OS to release any remaining locks
         time.sleep(2.0)
-        print(f"Force cleared locks for {project_name}")
+        logger.info(f"Force cleared locks for {project_name}")
 
 def get_qdrant_client(project_name: str) -> QdrantClient:
     """
@@ -202,14 +204,14 @@ def flush_batch(buffer, vs, con):
 
     vs.add_documents(buffer)
     con.commit()
-    print(f'  Flushed {len(buffer)} chunks → Qdrant')
+    logger.info(f'Flushed {len(buffer)} chunks → Qdrant')
     buffer.clear()
 
 # --- Step 5: Main Ingestion ---
 def embed_directory_batched(root_dir: str, project_name: str, collection_name: str, batch_size: int = BATCH_SIZE) -> None:
     txt_paths = find_txt_files(root_dir)
     if not txt_paths:
-        print(f'No .txt files found under {root_dir}')
+        logger.warning(f'No .txt files found under {root_dir}')
         return
 
     # Initialize DB
@@ -222,16 +224,16 @@ def embed_directory_batched(root_dir: str, project_name: str, collection_name: s
 
     # Ensure collection exists
     ensure_collection(client, collection_name, embeddings)
-    vs = Qdrant(client=client, collection_name=collection_name, embeddings=embeddings)
+    vs = QdrantVectorStore(client=client, collection_name=collection_name, embedding=embeddings)
 
     staging_buffer = []  # holds chunks before flushing
 
-    print(f'Indexing {len(txt_paths)} files from {root_dir} …')
+    logger.info(f'Indexing {len(txt_paths)} files from {root_dir} …')
     for path in tqdm(txt_paths, desc='Indexing files'):
         # Step 1: hash check
         h = file_sha256(path)
         if document_exists(con, h):
-            print(f'  SKIP (already indexed): {path.relative_to(root_dir)}')
+            logger.debug(f'SKIP (already indexed): {path.relative_to(root_dir)}')
             continue
 
         # Step 2: parse and insert doc row
@@ -247,7 +249,7 @@ def embed_directory_batched(root_dir: str, project_name: str, collection_name: s
 
         # Step 4: stage chunks
         staging_buffer.extend(chunks)
-        print(f'  Staged {len(chunks)} chunks from {path.relative_to(root_dir)}')
+        logger.debug(f'Staged {len(chunks)} chunks from {path.relative_to(root_dir)}')
 
         # Step 5: flush if buffer full
         if len(staging_buffer) >= batch_size:
@@ -294,14 +296,14 @@ def delete_document_from_store(con, client, collection_name: str, doc_id: str) -
 
     # 2. Delete from SQLite
     delete_document(con, doc_id)
-    print(f"Deleted document {doc_id} from DB and Qdrant.")
+    logger.info(f"Deleted document {doc_id} from DB and Qdrant.")
 
 
 # --- Lock Management Functions (merged from clear_qdrant_locks.py) ---
 
 def clear_qdrant_locks():
     """Clear any existing Qdrant locks and force cleanup."""
-    print("🔧 Clearing Qdrant locks and connections...")
+    logger.debug("🔧 Clearing Qdrant locks and connections...")
     
     try:
         # Force close all clients
@@ -316,20 +318,20 @@ def clear_qdrant_locks():
             for project_dir in projects_dir.iterdir():
                 if project_dir.is_dir():
                     project_name = project_dir.name
-                    print(f"🔓 Clearing locks for project: {project_name}")
+                    logger.debug(f"🔓 Clearing locks for project: {project_name}")
                     force_clear_qdrant_locks(project_name)
         
-        print("✅ Successfully cleared Qdrant locks and connections")
+        logger.debug("✅ Successfully cleared Qdrant locks and connections")
         return True
         
     except Exception as e:
-        print(f"❌ Error clearing Qdrant locks: {e}")
+        logger.debug(f"❌ Error clearing Qdrant locks: {e}")
         return False
 
 
 def check_qdrant_processes():
     """Check if there are any Qdrant processes running."""
-    print("🔍 Checking for Qdrant processes...")
+    logger.debug("🔍 Checking for Qdrant processes...")
     
     try:
         import psutil
@@ -343,23 +345,23 @@ def check_qdrant_processes():
                 pass
         
         if qdrant_processes:
-            print(f"⚠️  Found {len(qdrant_processes)} Qdrant processes:")
+            logger.debug(f"⚠️  Found {len(qdrant_processes)} Qdrant processes:")
             for proc in qdrant_processes:
-                print(f"   PID {proc['pid']}: {proc['name']}")
+                logger.debug(f"   PID {proc['pid']}: {proc['name']}")
             return True
         else:
-            print("✅ No Qdrant processes found")
+            logger.debug("✅ No Qdrant processes found")
             return False
             
     except ImportError:
-        print("⚠️  psutil not available, skipping process check")
+        logger.debug("⚠️  psutil not available, skipping process check")
         return False
 
 
 def main_lock_cleanup():
     """Main function to clear Qdrant locks (for CLI usage)."""
-    print("🚀 Qdrant Lock Cleanup Utility")
-    print("=" * 40)
+    logger.debug("🚀 Qdrant Lock Cleanup Utility")
+    logger.debug("=" * 40)
     
     # Check for processes first
     has_processes = check_qdrant_processes()
@@ -368,17 +370,17 @@ def main_lock_cleanup():
     success = clear_qdrant_locks()
     
     if has_processes:
-        print("\n⚠️  Note: Qdrant processes were detected.")
-        print("   You may need to restart your application or kill these processes manually.")
+        logger.debug("\n⚠️  Note: Qdrant processes were detected.")
+        logger.debug("   You may need to restart your application or kill these processes manually.")
     
     if success:
-        print("\n✅ Cleanup completed successfully!")
-        print("   You can now try running your application again.")
+        logger.debug("\n✅ Cleanup completed successfully!")
+        logger.debug("   You can now try running your application again.")
     else:
-        print("\n❌ Cleanup failed. You may need to:")
-        print("   1. Restart your terminal/IDE")
-        print("   2. Kill any remaining Qdrant processes")
-        print("   3. Restart your application")
+        logger.debug("\n❌ Cleanup failed. You may need to:")
+        logger.debug("   1. Restart your terminal/IDE")
+        logger.debug("   2. Kill any remaining Qdrant processes")
+        logger.debug("   3. Restart your application")
     
     return 0 if success else 1
 

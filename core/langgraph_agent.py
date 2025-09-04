@@ -11,7 +11,9 @@ from core.retriever_chain import load_chain
 from typing import Annotated
 from langgraph.graph.message import add_messages
 import config
-from config import using_cohere
+from config import using_cohere, get_logger
+
+logger = get_logger(__name__)
 
 # ✅ Cache the chain so it reuses the same Qdrant client
 @st.cache_resource
@@ -60,21 +62,21 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
     
     # Try to get project and collection from parameters first, then fall back to session state
     if project_name is None or collection_name is None:
-        print(f"🔍 **Tool Debug:** Parameters not provided, trying session state...")
+        logger.debug("Parameters not provided, trying session state...")
         if "selected_project" in st.session_state and "collection_name" in st.session_state:
             project_name = st.session_state["selected_project"]
             collection_name = st.session_state["collection_name"]
-            print(f"🔍 **Tool Debug:** Got from session state: {project_name}, {collection_name}")
+            logger.debug(f"Got from session state: {project_name}, {collection_name}")
         else:
-            print(f"🔍 **Tool Debug:** No project/collection found in session state")
+            logger.error("No project/collection found in session state")
             return "Error: No project selected or collection name not found."
     else:
-        print(f"🔍 **Tool Debug:** Using provided parameters: {project_name}, {collection_name}")
+        logger.debug(f"Using provided parameters: {project_name}, {collection_name}")
     
     if project_name and collection_name:
-        print(f"🔍 **Tool Debug:** Querying project: {project_name}, collection: {collection_name}")
-        print(f"🔍 **Tool Debug:** Source types filter: {source_types}")
-        print(f"🔍 **Tool Debug:** Year range filter: {year_range}")
+        logger.debug(f"Querying project: {project_name}, collection: {collection_name}")
+        logger.debug(f"Source types filter: {source_types}")
+        logger.debug(f"Year range filter: {year_range}")
         
         if using_cohere:
             qa_chain, naive_retriever, compression_retriever = get_chains(project_name, collection_name, source_types, year_range)
@@ -88,10 +90,10 @@ def historical_rag_tool(question: str, project_name: str = None, collection_name
         result = response.get('result', '')
         source_docs = response.get('source_documents', [])
         
-        print(f"🔍 **Tool Debug:** Query: '{question}'")
-        print(f"🔍 **Tool Debug:** Response keys: {list(response.keys())}")
-        print(f"🔍 **Tool Debug:** Result length: {len(result)}")
-        print(f"🔍 **Tool Debug:** Source docs count: {len(source_docs)}")
+        logger.debug(f"Query: '{question}'")
+        logger.debug(f"Response keys: {list(response.keys())}")
+        logger.debug(f"Result length: {len(result)}")
+        logger.debug(f"Source docs count: {len(source_docs)}")
         
         # Return a structured response that includes both result and source information
         if source_docs:

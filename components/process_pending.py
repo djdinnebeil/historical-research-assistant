@@ -1,23 +1,24 @@
 import streamlit as st
-from core.database import list_documents_by_status, update_document_status
+from core import list_documents_by_status, update_document_status, get_qdrant_client, adaptive_chunk_documents, embed_documents
 from components.text_parsers.unified_parser import parse_file
-from core.vector_store import get_qdrant_client, adaptive_chunk_documents
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from langchain.schema import Document
 from pathlib import Path
-from core.embedder import embed_documents
 from components.pending_list import render_pending_list
-from core.batch_processor import DocumentBatchProcessor
+from core import DocumentBatchProcessor
+from config import get_logger
+
+logger = get_logger(__name__)
 
 def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     st.subheader("⚙️ Process Pending Documents")
 
     # Debug information
-    print("🔍 Debug Information")
-    print(f"Project directory: {proj_dir}")
-    print(f"Database connection: {con}")
-    print(f"Database path: {getattr(con, 'path', 'Unknown')}")
+    logger.debug("🔍 Debug Information")
+    logger.debug(f"Project directory: {proj_dir}")
+    logger.debug(f"Database connection: {con}")
+    logger.debug(f"Database path: {getattr(con, 'path', 'Unknown')}")
     
     # Check if the database file actually exists
     if hasattr(con, 'path'):
@@ -28,8 +29,8 @@ def render_process_pending(proj_dir, con, qdrant_path, collection_name):
     # Check project database path
     project_name = Path(proj_dir).name
     expected_db_path = proj_dir / f"{project_name}.sqlite"
-    print(f"Expected DB path: {expected_db_path}")
-    print(f"Expected DB exists: {expected_db_path.exists()}")
+    logger.debug(f"Expected DB path: {expected_db_path}")
+    logger.debug(f"Expected DB exists: {expected_db_path.exists()}")
     
     rows = list_documents_by_status(con, "pending")
     if not rows:

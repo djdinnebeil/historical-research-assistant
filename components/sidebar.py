@@ -2,9 +2,12 @@ import streamlit as st
 from pathlib import Path
 from core.database import ensure_db, set_project_db
 from core.vector_store import get_qdrant_client, clear_qdrant_cache
+from config import get_logger
 
-# Use absolute path to avoid relative path resolution issues
-PROJECTS_DIR = Path.cwd() / "projects"
+logger = get_logger(__name__)
+
+# Import settings from config
+from config import PROJECTS_DIR
 
 def list_projects():
     if not PROJECTS_DIR.exists():
@@ -29,33 +32,33 @@ def clear_project_session_state():
         del st.session_state[key]
 
 def render_sidebar():
-    print("🔧 Sidebar: Starting render_sidebar function")
+    logger.debug("Starting render_sidebar function")
     projects = list_projects()
-    print(f"🔧 Sidebar: Found projects: {projects}")
+    logger.debug(f"Found projects: {projects}")
 
     # --- Manage session state for selected project ---
     if "selected_project" not in st.session_state:
-        print("🔧 Sidebar: No selected_project in session state, setting to '-- New Project --'")
+        logger.debug("No selected_project in session state, setting to '-- New Project --'")
         st.session_state["selected_project"] = "-- New Project --"
     else:
-        print(f"🔧 Sidebar: Current selected_project: {st.session_state['selected_project']}")
+        logger.debug(f"Current selected_project: {st.session_state['selected_project']}")
     
     # Initialize project change counter
     if "project_change_counter" not in st.session_state:
-        print("🔧 Sidebar: No project_change_counter in session state, setting to 0")
+        logger.debug("No project_change_counter in session state, setting to 0")
         st.session_state["project_change_counter"] = 0
     else:
-        print(f"🔧 Sidebar: Current project_change_counter: {st.session_state['project_change_counter']}")
+        logger.debug(f"Current project_change_counter: {st.session_state['project_change_counter']}")
     
     # Preserve navigation choice across project switches
     if "current_nav_choice" not in st.session_state:
-        print("🔧 Sidebar: No current_nav_choice in session state, setting to 'Upload Documents'")
+        logger.debug("No current_nav_choice in session state, setting to 'Upload Documents'")
         st.session_state["current_nav_choice"] = "Upload Documents"
     else:
-        print(f"🔧 Sidebar: Current current_nav_choice: {st.session_state['current_nav_choice']}")
+        logger.debug(f"Current current_nav_choice: {st.session_state['current_nav_choice']}")
 
     options = ["-- New Project --"] + projects
-    print(f"🔧 Sidebar: Available options: {options}")
+    logger.debug(f"Available options: {options}")
     
     selected = st.sidebar.selectbox(
         "Select a project",
@@ -64,14 +67,14 @@ def render_sidebar():
               if st.session_state["selected_project"] in options else 0,
         key="project_select"
     )
-    print(f"🔧 Sidebar: User selected: {selected}")
+    logger.debug(f"User selected: {selected}")
     
     # No project switching logic here - let the main app handle it
     # This prevents conflicts and race conditions
     
     # Validate that the selected project is valid
     if selected != "-- New Project --" and selected not in projects:
-        print(f"🔧 Sidebar: ERROR - Project '{selected}' no longer available!")
+        logger.warning(f"Project '{selected}' no longer available!")
         st.error(f"❌ Project '{selected}' is no longer available!")
         st.session_state["selected_project"] = "-- New Project --"
         clear_project_session_state()
@@ -79,19 +82,19 @@ def render_sidebar():
 
     # Check if selected project still exists (in case it was deleted)
     if selected != "-- New Project --" and not (PROJECTS_DIR / selected).exists():
-        print(f"🔧 Sidebar: ERROR - Project '{selected}' no longer exists!")
+        logger.error(f"Project '{selected}' no longer exists!")
         st.error(f"❌ Project '{selected}' no longer exists!")
         st.session_state["selected_project"] = "-- New Project --"
         clear_project_session_state()
         st.rerun()
 
     if selected == "-- New Project --":
-        print("🔧 Sidebar: New project creation mode")
+        logger.debug("New project creation mode")
         new_name = st.sidebar.text_input("New project name")
         collection_name = st.sidebar.text_input("Vector collection name", value=f"{new_name}_docs")
 
         if st.sidebar.button("Create Project"):
-            print(f"🔧 Sidebar: Creating new project: {new_name}")
+            logger.info(f"Creating new project: {new_name}")
             proj_dir = PROJECTS_DIR / new_name
             if proj_dir.exists():
                 st.error("Project already exists!")
@@ -106,11 +109,10 @@ def render_sidebar():
                 st.session_state["collection_name"] = collection_name
                 st.session_state["selected_project"] = new_name
                 st.rerun()
-
         return None, None, None, None
 
     # --- Navigation menu ---
-    print(f"🔧 Sidebar: Setting up navigation for project: {selected}")
+    logger.debug(f"Setting up navigation for project: {selected}")
     
     # Define navigation options
     nav_options = ["Upload Documents", "Process Pending", "Document Sync", "Document Manager", "Vector Store", "Ask Questions", "Chat History", "Project Management"]
@@ -130,35 +132,35 @@ def render_sidebar():
         index=nav_index,
         key=f"nav_radio_{selected}"  # Unique key per project to prevent conflicts
     )
-    print(f"🔧 Sidebar: Navigation choice: {nav_choice}")
+    logger.debug(f"Navigation choice: {nav_choice}")
     
     # Update stored navigation choice immediately
     if nav_choice != st.session_state.get("current_nav_choice"):
-        print(f"🔧 Sidebar: Navigation changed from {st.session_state.get('current_nav_choice', 'None')} to {nav_choice}")
+        logger.info(f"Navigation changed from {st.session_state.get('current_nav_choice', 'None')} to {nav_choice}")
         st.session_state["current_nav_choice"] = nav_choice
 
-    print(f"🔧 Sidebar: Processing project: {selected}")
+    logger.debug(f"Processing project: {selected}")
     proj_dir = PROJECTS_DIR / selected
-    print(f"🔧 Sidebar: Project directory: {proj_dir}")
-    print(f"🔧 Sidebar: Project directory exists: {proj_dir.exists()}")
+    logger.debug(f"Project directory: {proj_dir}")
+    logger.debug(f"Project directory exists: {proj_dir.exists()}")
     
     set_project_db(selected)
-    print(f"🔧 Sidebar: Database set for project: {selected}")
+    logger.debug(f"Database set for project: {selected}")
     
     con = ensure_db()
-    print(f"🔧 Sidebar: Database connection established: {con is not None}")
+    logger.debug(f"Database connection established: {con is not None}")
     
-    print(f"🔧 Sidebar: Getting Qdrant client for project: {selected}")
+    logger.debug(f"Getting Qdrant client for project: {selected}")
     client = get_qdrant_client(selected)
-    print(f"🔧 Sidebar: Qdrant client obtained: {client is not None}")
+    logger.debug(f"Qdrant client obtained: {client is not None}")
     
     st.success(f"Loaded project {selected}")
-    print(f"🔧 Sidebar: Success message displayed for project: {selected}")
+    logger.debug(f"Success message displayed for project: {selected}")
     
     # Update session state for the current project
     st.session_state["selected_project"] = selected
     st.session_state["collection_name"] = f"{selected}_docs"
-    print(f"🔧 Sidebar: Session state updated: selected_project={selected}, collection_name={f'{selected}_docs'}")
-
-    print(f"🔧 Sidebar: Returning values: selected={selected}, proj_dir={proj_dir}, db_client={con is not None}, nav_choice={nav_choice}")
+    logger.debug(f"Session state updated: selected_project={selected}, collection_name={f'{selected}_docs'}")
+    
+    logger.debug(f"Returning values: selected={selected}, proj_dir={proj_dir}, db_client={con is not None}, nav_choice={nav_choice}")
     return selected, proj_dir, (con, client), nav_choice

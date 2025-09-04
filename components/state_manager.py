@@ -3,6 +3,9 @@ State management component to handle project state and session management.
 """
 import streamlit as st
 from core.vector_store import clear_qdrant_cache, force_clear_all_qdrant_caches
+from config import get_logger
+
+logger = get_logger(__name__)
 
 
 def initialize_app_state():
@@ -30,26 +33,26 @@ def handle_project_change(selected: str):
     
     # Check if project has changed
     if st.session_state["last_selected_project"] != selected:
-        print(f"🔄 Project change detected: {st.session_state['last_selected_project']} → {selected}")
+        logger.info(f"Project change detected: {st.session_state['last_selected_project']} → {selected}")
         
         # Clear old project data
         if "db_client" in st.session_state:
-            print("🗑️ Clearing old db_client")
+            logger.debug("Clearing old db_client")
             del st.session_state["db_client"]
         
         # Clear Qdrant cache
-        print("🗑️ Clearing Qdrant cache")
+        logger.debug("Clearing Qdrant cache")
         force_clear_all_qdrant_caches()
         
         # Update tracking
         st.session_state["last_selected_project"] = selected
         st.session_state["project_change_counter"] = st.session_state.get("project_change_counter", 0) + 1
-        print(f"🔄 Updated project tracking: {selected}, counter: {st.session_state['project_change_counter']}")
+        logger.info(f"Updated project tracking: {selected}, counter: {st.session_state['project_change_counter']}")
         
         # Force a rerun to ensure clean state
         st.rerun()
     else:
-        print(f"✅ Same project, no change needed: {selected}")
+        logger.debug(f"Same project, no change needed: {selected}")
 
 
 def handle_navigation_change(nav_choice: str):
@@ -62,7 +65,7 @@ def handle_navigation_change(nav_choice: str):
     if "last_nav_choice" not in st.session_state:
         st.session_state["last_nav_choice"] = nav_choice
     elif st.session_state["last_nav_choice"] != nav_choice:
-        print(f"🔄 Navigation changed: {st.session_state['last_nav_choice']} → {nav_choice}")
+        logger.info(f"Navigation changed: {st.session_state['last_nav_choice']} → {nav_choice}")
         st.session_state["last_nav_choice"] = nav_choice
         st.rerun()
 
@@ -96,7 +99,7 @@ def render_project_info(selected: str):
         
         # Show project change counter for debugging
         if "project_change_counter" in st.session_state:
-            print(f"Project changes: {st.session_state['project_change_counter']}")
+            logger.debug(f"Project changes: {st.session_state['project_change_counter']}")
 
 
 def debug_project_state(selected: str, proj_dir, db_client, nav_choice: str):
@@ -109,14 +112,14 @@ def debug_project_state(selected: str, proj_dir, db_client, nav_choice: str):
         db_client: The database client
         nav_choice: The navigation choice
     """
-    print(f"Debug: selected={selected}, last_selected_project={st.session_state.get('last_selected_project', 'None')}, db_client={db_client is not None}")
+    logger.debug(f"Debug: selected={selected}, last_selected_project={st.session_state.get('last_selected_project', 'None')}, db_client={db_client is not None}")
     
     if selected != "-- New Project --" and proj_dir is not None:
-        print(f"Directory exists: {proj_dir.exists()}")
-        print(f"Project details: {selected}")
-        print(f"Navigation choice: {nav_choice}")
-        print(f"DB client type: {type(db_client)}")
+        logger.debug(f"Directory exists: {proj_dir.exists()}")
+        logger.debug(f"Project details: {selected}")
+        logger.debug(f"Navigation choice: {nav_choice}")
+        logger.debug(f"DB client type: {type(db_client)}")
     elif selected == "-- New Project --":
-        print("No project selected - new project creation mode")
+        logger.debug("No project selected - new project creation mode")
     else:
-        print(f"Project selected but proj_dir is None: {selected}")
+        logger.warning(f"Project selected but proj_dir is None: {selected}")

@@ -35,7 +35,8 @@ from .vector_store import (
     force_clear_all_qdrant_caches,
     clear_qdrant_locks,
     check_qdrant_processes,
-    main_lock_cleanup
+    main_lock_cleanup,
+    adaptive_chunk_documents
 )
 
 # Retrieval and embedding

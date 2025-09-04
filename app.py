@@ -9,10 +9,19 @@ from components.state_manager import (
     render_project_info,
     debug_project_state
 )
+from config import initialize_app, get_logger
+
+# Initialize logging and directories
+initialize_app()
+logger = get_logger(__name__)
 
 
 def main():
     """Main application entry point."""
+    if "initialized" not in st.session_state or not st.session_state["initialized"]:
+        st.session_state["initialized"] = True
+        logger.info("Starting Historical Research Assistant")
+
     # Initialize application state
     initialize_app_state()
     
@@ -22,6 +31,7 @@ def main():
     # Show initial message if not initialized
     if not st.session_state.get("initialized", False):
         st.write("To use this application, please select a project or create a new one.")
+        logger.info("Application initialized, waiting for project selection")
     
     # Get project and navigation state from sidebar
     selected, proj_dir, db_client, nav_choice = render_sidebar()

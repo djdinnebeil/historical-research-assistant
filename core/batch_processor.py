@@ -1,10 +1,12 @@
 from core.embedder import embed_documents
 from core.database import update_document_status
+from typing import List, Tuple, Optional
+from langchain.schema import Document
 
 class DocumentBatchProcessor:
     """Handles batching of document chunks for vector store processing."""
     
-    def __init__(self, batch_size, project_name, collection_name):
+    def __init__(self, batch_size: int, project_name: str, collection_name: str):
         self.batch_size = batch_size
         self.project_name = project_name
         self.collection_name = collection_name
@@ -12,7 +14,7 @@ class DocumentBatchProcessor:
         self.batch_count = 0
         self.document_chunk_counts = {}
     
-    def add_document(self, chunks, content_hash, chunk_count):
+    def add_document(self, chunks: List[Document], content_hash: str, chunk_count: int) -> Optional[List[Tuple[str, int]]]:
         """Add document chunks to the staging buffer.
         
         Args:
@@ -40,7 +42,7 @@ class DocumentBatchProcessor:
             return self.flush_batch()
         return None
     
-    def flush_batch(self):
+    def flush_batch(self) -> List[Tuple[str, int]]:
         """Process the current batch and clear the buffer.
         
         Returns:
@@ -81,7 +83,7 @@ class DocumentBatchProcessor:
             self.staging_buffer.clear()
             raise e
     
-    def finalize(self):
+    def finalize(self) -> List[Tuple[str, int]]:
         """Process any remaining chunks in the buffer.
         
         Returns:
@@ -91,15 +93,15 @@ class DocumentBatchProcessor:
             return self.flush_batch()
         return []
     
-    def get_batch_count(self):
+    def get_batch_count(self) -> int:
         """Get the total number of batches processed."""
         return self.batch_count
     
-    def get_buffer_size(self):
+    def get_buffer_size(self) -> int:
         """Get the current number of chunks in the buffer."""
         return len(self.staging_buffer)
     
-    def reset(self):
+    def reset(self) -> None:
         """Reset the processor state."""
         self.staging_buffer.clear()
         self.batch_count = 0

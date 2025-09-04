@@ -1,12 +1,9 @@
 import streamlit as st
 from pathlib import Path
 import hashlib
-from core.database import document_exists, insert_document, update_document_status
+from core import document_exists, insert_document, update_document_status, adaptive_chunk_documents, embed_documents, DocumentBatchProcessor
 from components.text_parsers.unified_parser import parse_file
-from core.vector_store import adaptive_chunk_documents
-from core.embedder import embed_documents
 from langchain.schema import Document
-from core.batch_processor import DocumentBatchProcessor
 
 def get_file_hash(file_path: Path) -> str:
     """Compute SHA256 hash for file content."""

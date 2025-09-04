@@ -2,13 +2,14 @@ import sqlite3
 import hashlib
 from pathlib import Path
 from datetime import datetime
+from typing import List, Tuple, Optional, Union
 
 # Global, must be set by set_project_db()
 DB_PATH: Path | None = None
-# Use absolute path to avoid relative path resolution issues
-PROJECTS_DIR = Path.cwd() / "projects"
+# Import settings from config
+from config import PROJECTS_DIR
 
-def file_sha256_from_buffer(buffer) -> str:
+def file_sha256_from_buffer(buffer: Union[bytes, bytearray]) -> str:
     h = hashlib.sha256()
     h.update(buffer)
     return h.hexdigest()
@@ -21,7 +22,7 @@ def file_sha256(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
-def set_project_db(project_name: str):
+def set_project_db(project_name: str) -> None:
     """
     Set the DB_PATH based on project_name.
     Database will be stored at: projects/{project_name}/{project_name}.sqlite
@@ -31,7 +32,7 @@ def set_project_db(project_name: str):
     proj_dir.mkdir(parents=True, exist_ok=True)
     DB_PATH = proj_dir / f"{project_name}.sqlite"
 
-def ensure_db():
+def ensure_db() -> sqlite3.Connection:
     """Ensure the database exists and has the correct schema."""
     if DB_PATH is None:
         raise RuntimeError("DB_PATH is not set. Call set_project_db() first.")
@@ -70,11 +71,11 @@ def ensure_db():
     return con
 
 
-def document_exists(con, content_hash: str) -> bool:
+def document_exists(con: sqlite3.Connection, content_hash: str) -> bool:
     cur = con.execute("SELECT 1 FROM documents WHERE content_hash = ?", (content_hash,))
     return cur.fetchone() is not None
 
-def insert_document(con, path: Path, parsed: dict, content_hash: str, num_chunks: int) -> None:
+def insert_document(con: sqlite3.Connection, path: Path, parsed: dict, content_hash: str, num_chunks: int) -> None:
     """Insert a new document record with its metadata + chunk count."""
     md = parsed['metadata']
     con.execute("""

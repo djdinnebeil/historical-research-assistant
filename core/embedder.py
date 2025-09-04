@@ -1,5 +1,5 @@
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from core.vector_store import get_qdrant_client, ensure_collection
 
 def embed_documents(docs, project_name: str, collection_name: str):
@@ -13,10 +13,10 @@ def embed_documents(docs, project_name: str, collection_name: str):
     ensure_collection(client, collection_name, embeddings)
 
     # Create vectorstore and add documents
-    vectorstore = Qdrant(
+    vectorstore = QdrantVectorStore(
         client=client,
         collection_name=collection_name,
-        embeddings=embeddings,
+        embedding=embeddings,
     )
 
     # Add documents to vector store

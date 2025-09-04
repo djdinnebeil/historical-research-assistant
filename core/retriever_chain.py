@@ -1,7 +1,7 @@
 # components/retriever_chain.py
 from pathlib import Path
 import streamlit as st
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from langchain_openai import OpenAIEmbeddings
 from qdrant_client import QdrantClient
 from langchain_openai import ChatOpenAI
@@ -9,13 +9,15 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain_cohere import CohereRerank
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
-from config import using_cohere
+from config import using_cohere, get_logger
 from qdrant_client.models import Filter, FieldCondition, MatchAny, MatchValue, Range
 from qdrant_client.http import models as qdrant_models
-
+from config import LLM_MODEL
 
 
 from core.vector_store import get_qdrant_client, ensure_collection
+
+logger = get_logger(__name__)
 
 prompt = PromptTemplate(
     template="""You are a helpful historical research assistant.
@@ -46,10 +48,10 @@ def load_chain(project_name: str, collection_name: str, source_types: list = Non
     # Ensure collection exists before creating vectorstore
     ensure_collection(client, collection_name, embeddings)
 
-    vectorstore = Qdrant(
+    vectorstore = QdrantVectorStore(
         client=client,
         collection_name=collection_name,
-        embeddings=embeddings
+        embedding=embeddings
     )
     
     # Build filter conditions
@@ -66,7 +68,7 @@ def load_chain(project_name: str, collection_name: str, source_types: list = Non
     
     if year_range:
         start_year, end_year = year_range
-        print(start_year, end_year)
+        logger.debug(f"Year range filter: {start_year} to {end_year}")
         filter_conditions.append(
             FieldCondition(
                 key="metadata.year",
@@ -92,7 +94,7 @@ def load_chain(project_name: str, collection_name: str, source_types: list = Non
     else:
         final_retriever = naive_retriever
 
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    llm = ChatOpenAI(model_name=LLM_MODEL, temperature=0)
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",

@@ -1,12 +1,10 @@
 import streamlit as st
 import shutil
 from pathlib import Path
-from core.database import ensure_db, set_project_db
-from core.vector_store import get_qdrant_client, clear_qdrant_cache
+from core import ensure_db, set_project_db, get_qdrant_client, clear_qdrant_cache
 
-# Use absolute paths to avoid relative path resolution issues
-PROJECTS_DIR = Path.cwd() / "projects"
-ARCHIVE_DIR = Path.cwd() / "archive"
+# Import settings from config
+from config import PROJECTS_DIR, ARCHIVE_DIR
 
 def ensure_archive_dir():
     """Ensure the archive directory exists"""

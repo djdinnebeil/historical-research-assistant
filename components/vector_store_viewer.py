@@ -1,9 +1,13 @@
 import streamlit as st
 from qdrant_client import QdrantClient
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from core.vector_store import get_qdrant_client, clear_qdrant_cache
 import json
+from config import get_logger
+
+logger = get_logger(__name__)
+
 
 def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
     st.subheader("🔍 Vector Store Viewer")
@@ -32,16 +36,16 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
             st.metric("Segments Count", collection_info.segments_count)
         
         # Debug information
-        print("🔍 Debug Information")
+        logger.debug("🔍 Debug Information")
         col1, col2 = st.columns(2)
         with col1:
-            print("**Collection Name:**", collection_name)
-            print("**Qdrant Path:**", str(qdrant_path))
-            print("**Project Name:**", project_name)
+            logger.debug("**Collection Name:**", collection_name)
+            logger.debug("**Qdrant Path:**", str(qdrant_path))
+            logger.debug("**Project Name:**", project_name)
         with col2:
-            print("**Client ID:**", id(client))
-            print("**Cache Status:**", "Cached" if hasattr(client, '_cached') else "Fresh")
-            print("**Connection Active:**", "✅ Yes" if client.collection_exists(collection_name) else "❌ No")
+            logger.debug("**Client ID:**", id(client))
+            logger.debug("**Cache Status:**", "Cached" if hasattr(client, '_cached') else "Fresh")
+            logger.debug("**Connection Active:**", "✅ Yes" if client.collection_exists(collection_name) else "❌ No")
         
         # Display collection configuration
         st.subheader("⚙️ Collection Configuration")
@@ -58,10 +62,10 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
         
         # Initialize embeddings and vector store
         embeddings = OpenAIEmbeddings()
-        vectorstore = Qdrant(
+        vectorstore = QdrantVectorStore(
             client=client,
             collection_name=collection_name,
-            embeddings=embeddings
+            embedding=embeddings
         )
         
         # Search interface
@@ -138,7 +142,7 @@ def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
         with col2:
             if st.button("🗑️ Delete Collection", type="secondary"):
                 # TODO: Implement this
-                print('This is not implemented yet.')
+                logger.debug('This is not implemented yet.')
                 # if st.checkbox("I understand this will permanently delete all vectors"):
                     # try:
                     #     client.delete_collection(collection_name)

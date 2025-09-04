@@ -2,7 +2,7 @@ import streamlit as st
 from core.database import list_all_documents, delete_document
 from core.vector_store import get_qdrant_client
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import QdrantVectorStore
 from pathlib import Path
 import json
 
