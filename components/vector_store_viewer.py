@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 
 def render_vector_store_viewer(proj_dir, qdrant_path, collection_name):
     st.subheader("🔍 Vector Store Viewer")
-    
+    logger.debug(f"render_vector_store_viewer")
     try:
         # Get Qdrant client
         project_name = proj_dir.name

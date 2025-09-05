@@ -81,7 +81,7 @@ def render_project_manager(proj_dir: Path, db_client, collection_name: str):
     st.header("🗂️ Project Management")
     
     project_name = proj_dir.name
-    st.info(f"Managing project: **{project_name}**")
+    # st.info(f"Managing project: **{project_name}**")
     
     # Project information
     col1, col2 = st.columns(2)

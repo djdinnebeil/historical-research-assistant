@@ -291,7 +291,7 @@ def sync_documents(proj_dir: Path, con, collection_name: str):
 def render_document_sync(proj_dir: Path, con, collection_name: str):
     """Main render function for the document sync component."""
     st.subheader("🔄 Document Sync")
-    st.write("This tool will scan your project's documents folder and automatically sync any new or changed documents to the database and vector store. It will also process any documents with 'pending' status.")
+    st.info("This tool will scan your project's documents folder and automatically sync any new or changed documents to the database and vector store. It will also process any documents with 'pending' status.")
     
     # Get document status using helper functions
     sync_status = get_document_sync_status(proj_dir, con)
@@ -323,5 +323,8 @@ def render_document_sync(proj_dir: Path, con, collection_name: str):
         return
     
     # Sync button
-    if st.button("🔄 Sync Documents"):
-        sync_documents(proj_dir, con, collection_name)
+    if sync_status['new_files_count'] > 0 or sync_status['pending_documents_count'] > 0:
+        if st.button("🔄 Sync Documents"):
+            sync_documents(proj_dir, con, collection_name)
+    else:
+        st.info("No new files or pending documents to sync.")

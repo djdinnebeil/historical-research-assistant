@@ -18,10 +18,10 @@ os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 # =============================================================================
 
 # Feature flags
-using_cohere = True
+using_cohere = True  # Set to False to disable Cohere reranking for debugging
 
 # Developer mode
-developer_mode = False
+developer_mode = True
 
 # Directory paths
 PROJECTS_DIR = Path.cwd() / "projects"
@@ -39,6 +39,11 @@ AGENT_MODEL = "gpt-4.1-nano"
 DEFAULT_COLLECTION_PREFIX = "_docs"
 DEFAULT_CHUNK_SIZE = 500
 DEFAULT_CHUNK_OVERLAP = 80
+
+# Retrieval settings
+ENABLE_DYNAMIC_RETRIEVAL_SCALING = True  # Set to False to use fixed retrieval parameters
+FIXED_RETRIEVAL_K = 15  # Used when dynamic scaling is disabled
+FIXED_FINAL_K = 10  # Used when dynamic scaling is disabled
 
 # UI settings
 DEFAULT_SOURCE_TYPES = ["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"]
@@ -110,6 +115,11 @@ def setup_logging():
     if not any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers):
         root_logger.addHandler(console_handler)
     
+    # Create a separate handler for application debug messages
+    app_handler = logging.StreamHandler(sys.stdout)
+    app_handler.setFormatter(formatter)
+    app_handler.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+    
     # Set specific loggers to appropriate levels to suppress third-party debug messages
     # Core libraries
     logging.getLogger("streamlit").setLevel(logging.WARNING)
@@ -177,16 +187,47 @@ def setup_logging():
 
 def get_logger(name: str) -> logging.Logger:
     """Get a logger instance for the given name."""
-    return logging.getLogger(name)
+    logger = logging.getLogger(name)
+    
+    # Ensure the logger is properly configured
+    if not logger.handlers and LOG_LEVEL != "CRITICAL":
+        # Create a handler for this specific logger
+        formatter = logging.Formatter(
+            fmt=LOG_FORMAT,
+            datefmt=LOG_DATE_FORMAT
+        )
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(formatter)
+        handler.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+        
+        logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+        logger.addHandler(handler)
+        logger.propagate = False
+    
+    return logger
 
 def set_application_log_level(level: str):
     """Set the log level specifically for your application modules."""
     app_level = getattr(logging, level.upper(), logging.INFO)
     
-    # Set level for your application modules
+    # Create a dedicated handler for application loggers
+    formatter = logging.Formatter(
+        fmt=LOG_FORMAT,
+        datefmt=LOG_DATE_FORMAT
+    )
+    app_handler = logging.StreamHandler(sys.stdout)
+    app_handler.setFormatter(formatter)
+    app_handler.setLevel(app_level)
+    
+    # Set level for your application modules and add the handler
     for logger_name in logging.Logger.manager.loggerDict:
         if logger_name.startswith(('historical_research_assistant', '__main__')):
-            logging.getLogger(logger_name).setLevel(app_level)
+            logger = logging.getLogger(logger_name)
+            logger.setLevel(app_level)
+            # Clear existing handlers and add our app handler
+            logger.handlers.clear()
+            logger.addHandler(app_handler)
+            logger.propagate = False  # Prevent propagation to root logger
     
     # Also set the root logger level for your application
     logging.getLogger().setLevel(app_level)

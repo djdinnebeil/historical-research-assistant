@@ -157,7 +157,7 @@ def render_sidebar():
     client = get_qdrant_client(selected)
     logger.debug(f"Qdrant client obtained: {client is not None}")
     
-    st.success(f"Loaded project {selected}")
+    # st.success(f"Loaded project {selected}")
     logger.debug(f"Success message displayed for project: {selected}")
     
     # Update session state for the current project

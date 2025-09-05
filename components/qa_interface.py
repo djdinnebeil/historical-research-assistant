@@ -13,7 +13,7 @@ def render_qa_interface(project_name: str, collection_name: str):
     #     # st.session_state.source_types_filter = ["book", "journal", "newspaper", "report", "web_article", "misc", "unsorted"]
     #     # st.session_state.search_mode = "Standard"
     
-    st.header("🤖 Ask Questions")
+    st.header("Ask Questions")
     st.markdown("Ask questions about your historical documents and get AI-powered answers that combine historical context with current information.")
     
     # Check for pending documents and new files
@@ -179,8 +179,93 @@ def render_qa_interface(project_name: str, collection_name: str):
             max_tokens = st.slider("Maximum response length", min_value=100, max_value=2000, value=1000, step=100)
             st.info("Advanced mode will use both your historical documents and web search for comprehensive answers.")
     
-    # Submit button - always enabled for better UX
-    if st.button("Ask Question", type="primary"):
+    # Debug and submit buttons
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        submit_button = st.button("Ask Question", type="primary")
+    
+    with col2:
+        debug_button = st.button("🔍 Debug Retrieval", type="secondary", help="Test what documents are being retrieved for this query")
+    
+    if debug_button and question.strip():
+        # Debug retrieval
+        print(f"🔍 DEBUG BUTTON CLICKED: Query='{question}', Project='{project_name}', Collection='{collection_name}'")
+        try:
+            if not project_name or project_name == "-- New Project --":
+                st.error("Please select a valid project first.")
+                print("❌ ERROR: No valid project selected")
+            else:
+                from core.retriever_chain import load_chain
+                
+                # Load the chain with filters
+                year_range = None
+                if year_filter_mode == "Single Year":
+                    year_range = (start_year, start_year)
+                elif year_filter_mode == "Year Range":
+                    year_range = (start_year, end_year)
+                
+                if using_cohere:
+                    qa_chain, naive_retriever, compression_retriever = load_chain(
+                        project_name, 
+                        collection_name, 
+                        source_types=source_types if source_types else None,
+                        year_range=year_range
+                    )
+                else:
+                    qa_chain, naive_retriever = load_chain(
+                        project_name, 
+                        collection_name, 
+                        source_types=source_types if source_types else None,
+                        year_range=year_range
+                    )
+                
+                # Test retrieval
+                if hasattr(qa_chain, 'test_retrieval'):
+                    with st.spinner("Testing retrieval..."):
+                        naive_docs, final_docs = qa_chain.test_retrieval(question)
+                        
+                        st.subheader("🔍 Retrieval Debug Results")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.write(f"**Naive Retriever:** {len(naive_docs)} documents")
+                            for i, doc in enumerate(naive_docs[:5]):
+                                with st.expander(f"Naive Doc {i+1}: {doc.page_content[:50]}..."):
+                                    st.write("**Content:**")
+                                    st.write(doc.page_content)
+                                    if hasattr(doc, 'metadata') and doc.metadata:
+                                        st.write("**Metadata:**")
+                                        st.json(doc.metadata)
+                        
+                        with col2:
+                            st.write(f"**Final Retriever:** {len(final_docs)} documents")
+                            for i, doc in enumerate(final_docs[:5]):
+                                with st.expander(f"Final Doc {i+1}: {doc.page_content[:50]}..."):
+                                    st.write("**Content:**")
+                                    st.write(doc.page_content)
+                                    if hasattr(doc, 'metadata') and doc.metadata:
+                                        st.write("**Metadata:**")
+                                        st.json(doc.metadata)
+                        
+                        # Test different strategies
+                        if hasattr(qa_chain, 'test_retrieval_strategies'):
+                            st.subheader("🔬 Different Retrieval Strategies")
+                            strategies = qa_chain.test_retrieval_strategies(question)
+                            
+                            for strategy in strategies:
+                                with st.expander(f"{strategy['name']} ({strategy['count']} docs)"):
+                                    for i, doc in enumerate(strategy['docs'][:3]):
+                                        st.write(f"**Doc {i+1}:** {doc.page_content[:100]}...")
+                                        if 'scores' in strategy and i < len(strategy['scores']):
+                                            st.write(f"Score: {strategy['scores'][i]:.4f}")
+                
+        except Exception as e:
+            st.error(f"Debug error: {str(e)}")
+            st.exception(e)
+    
+    if submit_button:
         if question.strip():
             with st.spinner("Thinking..."):
                 try:

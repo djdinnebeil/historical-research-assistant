@@ -46,6 +46,57 @@ def render_books_uploader(proj_dir: Path, con):
             st.success(f"✅ metadata.json created for {folder_name}")
     else:
         st.success("📑 metadata.json already exists")
+        
+        # Display existing metadata and option to update
+        with open(meta_file, "r", encoding="utf-8") as f:
+            existing_metadata = json.load(f)
+        
+        st.subheader("📋 Current Metadata")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write(f"**Title:** {existing_metadata.get('title', 'N/A')}")
+            st.write(f"**Year:** {existing_metadata.get('year', 'N/A')}")
+        
+        with col2:
+            st.write(f"**Source ID:** {existing_metadata.get('source_id', 'N/A')}")
+            st.write(f"**Source Type:** {existing_metadata.get('source_type', 'N/A')}")
+        
+        st.write(f"**Citation Format:** `{existing_metadata.get('citation_format', 'N/A')}`")
+        
+        # Option to update metadata
+        if st.button("✏️ Update Metadata"):
+            st.session_state.update_metadata = True
+        
+        if st.session_state.get('update_metadata', False):
+            st.subheader("✏️ Update Metadata")
+            
+            # Pre-fill form with existing values
+            new_title = st.text_input("Book title", value=existing_metadata.get('title', ''))
+            new_year = st.number_input("Year", min_value=0, max_value=2100, value=existing_metadata.get('year', 1918))
+            new_citation_format = st.text_input("Citation format", value=existing_metadata.get('citation_format', '{title}, {year}, {page}, {section}'))
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("💾 Save Changes"):
+                    updated_data = {
+                        "source_type": "book",
+                        "source_id": folder_name,
+                        "title": new_title,
+                        "year": new_year,
+                        "citation_format": new_citation_format
+                    }
+                    with open(meta_file, "w", encoding="utf-8") as f:
+                        json.dump(updated_data, f, indent=4)
+                    st.success(f"✅ metadata.json updated for {folder_name}")
+                    st.session_state.update_metadata = False
+                    st.rerun()
+            
+            with col2:
+                if st.button("❌ Cancel"):
+                    st.session_state.update_metadata = False
+                    st.rerun()
+        
 
     # Step 3: Upload text files for this book
     uploaded_files = st.file_uploader(

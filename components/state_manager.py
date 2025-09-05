@@ -122,4 +122,5 @@ def debug_project_state(selected: str, proj_dir, db_client, nav_choice: str):
     elif selected == "-- New Project --":
         logger.debug("No project selected - new project creation mode")
     else:
-        logger.warning(f"Project selected but proj_dir is None: {selected}")
+        # logger.warning(f"Project selected but proj_dir is None: {selected}")
+        pass

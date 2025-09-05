@@ -170,16 +170,26 @@ def adaptive_chunk_documents(docs: list[Document], model: str = 'text-embedding-
         text = doc.page_content
         token_count = len(enc.encode(text))
 
-        if token_count < 500:
-            out_docs.append(doc)  # keep whole
-        elif token_count < 1500:
+        # Improved chunking strategy for better retrieval
+        if token_count < 300:
+            # Very small documents - keep whole but ensure minimum context
+            out_docs.append(doc)
+        elif token_count < 800:
+            # Medium documents - use smaller chunks with more overlap
             splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-                model_name=model, chunk_size=500, chunk_overlap=80
+                model_name=model, chunk_size=400, chunk_overlap=100
+            )
+            out_docs.extend(splitter.split_documents([doc]))
+        elif token_count < 2000:
+            # Large documents - use medium chunks
+            splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+                model_name=model, chunk_size=600, chunk_overlap=120
             )
             out_docs.extend(splitter.split_documents([doc]))
         else:
+            # Very large documents - use larger chunks but still reasonable
             splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-                model_name=model, chunk_size=800, chunk_overlap=100
+                model_name=model, chunk_size=800, chunk_overlap=150
             )
             out_docs.extend(splitter.split_documents([doc]))
 

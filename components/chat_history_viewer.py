@@ -6,7 +6,7 @@ def render_chat_history_viewer(con, project_name: str):
     """Render the chat history viewer component."""
     
     st.header("💬 Chat History")
-    st.markdown(f"Viewing chat history for project: **{project_name}**")
+    # st.markdown(f"Viewing chat history for project: **{project_name}**")
     
     # Get chat history from database
     from core.database import get_chat_history, delete_chat_entry, clear_chat_history, get_chat_history_count

@@ -18,6 +18,9 @@ UPLOADERS = {
 }
 
 def render_uploader(proj_dir, con):
-    doc_type = st.selectbox("Select document type", list(UPLOADERS.keys()))
+    st.header("Upload Documents")
+    doc_type = st.selectbox("Select document type", list(UPLOADERS.keys()), index=None)
+    if doc_type is None:
+        return
     uploader = UPLOADERS[doc_type]
     uploader(proj_dir, con)
