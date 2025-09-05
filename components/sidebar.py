@@ -91,7 +91,8 @@ def render_sidebar():
     if selected == "-- New Project --":
         logger.debug("New project creation mode")
         new_name = st.sidebar.text_input("New project name")
-        collection_name = st.sidebar.text_input("Vector collection name", value=f"{new_name}_docs")
+        # collection_name = st.sidebar.text_input("Vector collection name", value=f"{new_name}_docs")
+        collection_name = f"{new_name}_docs"
 
         if st.sidebar.button("Create Project"):
             logger.info(f"Creating new project: {new_name}")
