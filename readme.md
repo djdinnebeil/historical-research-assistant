@@ -1,231 +1,186 @@
 # 📜 Historical Research Assistant
 
-A powerful AI-powered application for historical research that combines document management, vector search, and intelligent question-answering capabilities. Built with Streamlit, LangChain, and Qdrant, this tool helps researchers, historians, and students efficiently process, organize, and query historical documents.
+A powerful AI-driven application for historical research that combines document management, vector search, and intelligent question-answering capabilities. Upload historical documents, organize them into projects, and ask sophisticated questions that leverage both your historical sources and current web information.
 
-## ✨ Features
-
-### 📚 Document Management
-- **Multi-format Support**: Upload and process various document types including books, journals, newspapers, reports, and web articles
-- **Intelligent Parsing**: Specialized parsers for different document types with metadata extraction
-- **Batch Processing**: Process multiple documents simultaneously with progress tracking
-- **Document Sync**: Keep your document collection synchronized and up-to-date
-
-### 🔍 Advanced Search & Retrieval
-- **Vector Search**: Semantic search through your document collection using embeddings
-- **Metadata Filtering**: Filter by document type, date range, and other metadata
-- **Source Citations**: Automatic extraction and display of source citations
-- **Contextual Retrieval**: Find relevant information even with imprecise queries
-
-### 🤖 AI-Powered Question Answering
-- **Intelligent Responses**: Get comprehensive answers combining historical documents with current context
-- **Web Search Integration**: Optional web search to supplement historical information with current data
-- **Offline Mode**: Work completely offline using only your uploaded documents
-- **Chat History**: Persistent conversation history with timestamps and source tracking
+## 🌟 Features
 
 ### 📁 Project Management
 - **Multi-Project Support**: Organize research into separate projects
-- **Archive System**: Archive completed projects for backup and future reference
-- **Project Statistics**: View document counts, storage usage, and collection status
-- **Easy Restoration**: Restore archived projects when needed
+- **Document Organization**: Categorize documents by type (books, journals, newspapers, reports, web articles, etc.)
+- **Project Archiving**: Archive completed projects for storage
 
-### 🎯 User Interface
-- **Streamlit Web App**: Clean, intuitive web interface
-- **Responsive Design**: Works on desktop and mobile devices
-- **Real-time Updates**: Live progress tracking and status updates
-- **Export Capabilities**: Save and export your research findings
+### 📄 Document Processing
+- **Multiple Format Support**: Upload and process various document types
+- **Intelligent Parsing**: Specialized parsers for different document categories
+- **Batch Processing**: Efficient processing of multiple documents
+- **Vector Embeddings**: Automatic conversion to searchable vector representations using OpenAI embeddings
 
-## 🚀 Quick Start
+### 🤖 AI-Powered Q&A
+- **Dual Search Modes**:
+  - **Standard Mode**: Search only within your uploaded historical documents
+  - **Advanced Mode**: Combine historical documents with current web search results
+- **LangGraph Agent**: Sophisticated AI agent that can reason about historical context
+- **Contextual Retrieval**: Advanced retrieval with optional Cohere reranking
+- **Chat History**: Track and review previous research conversations
+
+### 🔍 Advanced Search & Filtering
+- **Source Type Filtering**: Filter by document categories (books, journals, newspapers, etc.)
+- **Year Range Filtering**: Focus on specific time periods
+- **Dynamic Retrieval Scaling**: Automatically adjust search parameters based on query complexity
+- **Vector Store Browsing**: Explore your document collection and embeddings
+
+### 🛠️ Management Tools
+- **Document Sync**: Keep your document database in sync with file changes
+- **Pending Document Processing**: Track and process documents in batches
+- **Vector Store Viewer**: Inspect and manage your document embeddings
+- **Database Management**: Built-in tools for maintaining data integrity
+
+## 🚀 Installation
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.8+
 - OpenAI API key
-- Tavily API key (optional, for web search features)
+- Cohere API key (optional, for reranking)
+- Tavily API key (for web search in Advanced mode)
 
-### Installation
+### Setup
 
-1. **Clone the repository**
+1. **Clone the repository**:
    ```bash
    git clone <repository-url>
    cd historical_research_assistant
    ```
 
-2. **Install dependencies**
+2. **Install dependencies**:
    ```bash
    uv pip install -r requirements.txt
    ```
 
-3. **Set up environment variables**
+3. **Environment Configuration**:
    Create a `.env` file in the project root:
    ```env
    OPENAI_API_KEY=your_openai_api_key_here
+   COHERE_API_KEY=your_cohere_api_key_here
    TAVILY_API_KEY=your_tavily_api_key_here
-   COHERE_API_KEY=your_cohere_api_key_here  # Optional
    ```
 
-4. **Run the application**
+4. **Run the application**:
    ```bash
    streamlit run app.py
    ```
 
-5. **Access the application**
-   Open your browser and navigate to `http://localhost:8501`
-
-## 📖 Usage Guide
+## 📖 Usage
 
 ### Getting Started
 
-1. **Create a New Project**
-   - Select "New Project" from the sidebar
-   - Enter a project name
-   - Click "Create Project"
+1. **Create a Project**: Start by creating a new research project or selecting an existing one
+2. **Upload Documents**: Use the document uploader to add your historical sources
+3. **Process Documents**: Run the batch processor to convert documents into searchable vectors
+4. **Ask Questions**: Use the Q&A interface to research your historical documents
 
-2. **Upload Documents**
-   - Navigate to "Upload Documents"
-   - Drag and drop files or use the file browser
-   - Supported formats: PDF, TXT, DOCX, and more
+### Document Types Supported
 
-3. **Process Documents**
-   - Go to "Process Pending" to convert documents to searchable format
-   - Monitor progress and handle any parsing errors
+- **Books**: Academic texts, historical volumes, reference materials
+- **Journals**: Academic papers, research articles, periodicals
+- **Newspapers**: Historical newspaper articles and clippings
+- **Reports**: Government reports, institutional documents, studies
+- **Web Articles**: Online sources and digital publications
+- **Miscellaneous**: Any other document types
+- **Unsorted**: Documents to be categorized later
 
-4. **Ask Questions**
-   - Use the "Ask Questions" interface to query your documents
-   - Enable/disable web search as needed
-   - View source citations for all answers
+### Search Modes
 
-### Advanced Features
+#### Standard Mode
+Perfect for pure historical research using only your uploaded documents:
+- Searches exclusively within your document collection
+- Maintains historical context and authenticity
+- Ideal for academic research and source verification
 
-#### Document Types & Parsers
-The system includes specialized parsers for different document types:
-- **Books**: Chapter and section detection
-- **Journals**: Article and citation extraction
-- **Newspapers**: Article and headline parsing
-- **Reports**: Structured document analysis
-- **Web Articles**: HTML content extraction
+#### Advanced Mode
+Combines historical documents with current information:
+- Uses your historical documents as primary sources
+- Supplements with current web search results
+- Provides modern context and contemporary perspectives
+- Excellent for understanding historical events' lasting impact
 
-#### Vector Search
-- Documents are automatically converted to embeddings
-- Semantic search finds relevant content even with different wording
-- Metadata filtering allows precise document targeting
+### Workflow Example
 
-#### Project Management
-- **Archive Projects**: Move completed projects to archive
-- **Delete Projects**: Remove projects with safety confirmations
-- **Restore Projects**: Bring back archived projects
-- **View Statistics**: Monitor project size and document counts
+1. **Project Setup**:
+   - Create project: "Industrial Revolution Research"
+   - Upload relevant books, journal articles, and newspaper clippings
 
-## 🏗️ Architecture
+2. **Document Processing**:
+   - Use the uploader to categorize documents by type
+   - Run batch processing to create vector embeddings
+   - Verify documents are properly synced
+
+3. **Research**:
+   - Ask: "What were the main social impacts of factory work on families?"
+   - Filter by newspapers and journals from 1800-1850
+   - Review sources and continue with follow-up questions
+
+## ⚙️ Configuration
+
+### Key Settings (config.py)
+
+- **Models**: Configure OpenAI models for embeddings and chat
+- **Vector Store**: Adjust chunk size and overlap for document processing
+- **Retrieval**: Enable/disable dynamic retrieval scaling
+- **Logging**: Control application logging levels
+- **Feature Flags**: Enable/disable Cohere reranking
+
+### Directory Structure
+
+```
+historical_research_assistant/
+├── projects/          # Individual research projects
+├── archive/          # Archived projects
+├── components/       # UI components
+├── core/            # Core functionality
+├── utils/           # Utility functions
+├── app.py           # Main application
+├── config.py        # Configuration settings
+└── requirements.txt # Dependencies
+```
+
+## 🔧 Technical Architecture
 
 ### Core Components
 
-- **`app.py`**: Main Streamlit application and navigation
-- **`langgraph_agent.py`**: AI agent for question-answering
-- **`retriever_chain.py`**: Document retrieval and RAG implementation
-- **`local_qdrant.py`**: Vector database management
-- **`embedder.py`**: Text embedding generation
-- **`db.py`**: SQLite database operations
+- **Vector Store**: Qdrant-based vector database for document embeddings
+- **LangGraph Agent**: Sophisticated AI reasoning with tool integration
+- **Retrieval Chain**: Advanced document retrieval with filtering and reranking
+- **Document Parsers**: Specialized processing for different document types
+- **Streamlit UI**: Interactive web interface for research workflows
 
-### Document Processing Pipeline
+### Data Flow
 
-1. **Upload**: Documents uploaded via web interface
-2. **Parse**: Specialized parsers extract text and metadata
-3. **Chunk**: Text split into manageable segments
-4. **Embed**: Convert chunks to vector embeddings
-5. **Store**: Save embeddings in Qdrant vector database
-6. **Index**: Create searchable index with metadata
+1. **Document Upload** → **Parsing** → **Chunking** → **Embedding** → **Vector Storage**
+2. **User Query** → **Vector Search** → **Retrieval** → **LLM Processing** → **Response**
+3. **Advanced Mode**: Includes web search integration for comprehensive answers
 
-### AI Integration
+## 🛡️ Privacy & Security
 
-- **LangChain**: Framework for document processing and retrieval
-- **LangGraph**: Agent orchestration and conversation flow
-- **OpenAI GPT-4**: Language model for answer generation
-- **Tavily**: Web search integration for current context
-
-## 🔧 Configuration
-
-### Environment Variables
-```env
-# Required
-OPENAI_API_KEY=your_openai_api_key
-
-# Optional
-TAVILY_API_KEY=your_tavily_api_key
-COHERE_API_KEY=your_cohere_api_key
-```
-
-### Project Structure
-```
-historical_research_assistant/
-├── components/          # UI components
-├── projects/           # Active projects
-├── archive/            # Archived projects
-├── app.py              # Main application
-├── config.py           # Configuration
-└── requirements.txt    # Dependencies
-```
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-#### Qdrant "Already Accessed" Error
-If you encounter Qdrant connection errors:
-```bash
-python clear_qdrant_locks.py
-streamlit run app.py
-```
-
-#### Document Processing Errors
-- Check file format compatibility
-- Verify file permissions
-- Review parser-specific error messages
-
-#### API Key Issues
-- Ensure all required API keys are set in `.env`
-- Verify API key validity and quotas
-- Check network connectivity
-
-### Performance Tips
-- Use specific, focused questions for faster responses
-- Process documents in smaller batches
-- Monitor disk space for large document collections
-- Consider archiving completed projects
-
-## 📚 Documentation
-
-Additional documentation is available in the project:
-- `PROJECT_MANAGEMENT_FEATURES.md`: Detailed project management guide
-- `README_QA_INTERFACE.md`: Question-answering interface documentation
-- `QDRANT_TROUBLESHOOTING.md`: Vector database troubleshooting
-- `VECTOR_DELETION_FIXES.md`: Vector store management
+- All document processing happens locally
+- Vector embeddings stored in local Qdrant instance
+- API keys securely managed through environment variables
+- No document content sent to external services except for embedding generation
 
 ## 🤝 Contributing
 
-We welcome contributions! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+This is a research tool designed for historical analysis. Contributions welcome for:
+- Additional document parsers
+- Enhanced search capabilities
+- UI improvements
+- Performance optimizations
 
-## 📄 License
+## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+[Add your license information here]
 
-## 🙏 Acknowledgments
-
-- Built with [Streamlit](https://streamlit.io/)
-- Powered by [LangChain](https://langchain.com/) and [LangGraph](https://langchain.com/langgraph)
-- Vector search by [Qdrant](https://qdrant.tech/)
-- AI capabilities by [OpenAI](https://openai.com/)
-
-## 📞 Support
+## 🆘 Support
 
 For issues, questions, or feature requests:
-1. Check the troubleshooting documentation
-2. Review existing issues on GitHub
-3. Create a new issue with detailed information
-
----
-
-**Happy Researching! 📜🔍**
+1. Check the application logs (configurable in `config.py`)
+2. Review the document sync status in the management tools
+3. Verify API key configuration in your `.env` file
